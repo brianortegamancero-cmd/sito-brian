@@ -195,15 +195,15 @@ function creaCompetenze(lista) {
   });
 }
 
-// I tre pulsanti della finestra del terminale, come in una vera finestra:
-// rosso = chiudi, giallo = riduci, verde = ingrandisci
+// I tre pulsanti della finestra del terminale:
+// rosso = chiudi, giallo = riduci, verde = vista a raggi X (vedi la sezione 7)
 function preparaFinestraTerminale() {
   const terminale = document.getElementById("terminale");
   const riapri = document.getElementById("riapri-terminale");
 
   // ROSSO: il terminale si chiude con un'animazione e compare il tasto per riaprirlo
   document.getElementById("chiudi-terminale").addEventListener("click", function () {
-    terminale.classList.remove("ingrandito", "ridotto");
+    terminale.classList.remove("ridotto");
     terminale.classList.add("si-chiude");
     setTimeout(function () {
       terminale.classList.remove("si-chiude");
@@ -219,19 +219,11 @@ function preparaFinestraTerminale() {
 
   // GIALLO: riduce il terminale alla sola barra in alto (premuto di nuovo, lo riapre)
   document.getElementById("riduci-terminale").addEventListener("click", function () {
-    terminale.classList.remove("ingrandito");
     terminale.classList.toggle("ridotto");
   });
 
-  // VERDE: il terminale riempie tutto lo schermo (premuto di nuovo, o con Esc, torna normale)
-  document.getElementById("ingrandisci-terminale").addEventListener("click", function () {
-    terminale.classList.remove("ridotto");
-    terminale.classList.toggle("ingrandito");
-  });
-
-  document.addEventListener("keydown", function (evento) {
-    if (evento.key === "Escape") terminale.classList.remove("ingrandito");
-  });
+  // VERDE: accende e spegne la vista a raggi X
+  document.getElementById("raggi-x").addEventListener("click", cambiaRaggiX);
 }
 
 // Avvia tutta la Home
@@ -487,7 +479,7 @@ function creaCmd() {
   barra.className = "cmd-barra";
 
   const titolo = document.createElement("span");
-  titolo.textContent = "C:\\BrianOS\\cmd.exe";
+  titolo.textContent = "C:\\BrainOS\\cmd.exe";   // BrainOS: Brian con due lettere scambiate = "cervello"
 
   const chiudi = document.createElement("button");
   chiudi.className = "cmd-chiudi";
@@ -542,7 +534,7 @@ function creaCmd() {
   document.body.appendChild(cmd);
 
   // Messaggio di benvenuto, come quello del vero CMD di Windows
-  scriviCmd("BrianOS [Versione 1.0]");
+  scriviCmd("BrainOS [Versione 1.0]");
   scriviCmd("(c) Brian Ortega. Tutti i diritti riservati.");
   scriviCmd(" ");
   scriviCmd("Scrivi help per vedere i comandi.", "cmd-verde");
@@ -704,7 +696,101 @@ function pioggiaMatrix() {
 }
 
 
-// 7. PARTENZA: preparo menu ed easter egg (ci sono in tutte le pagine),
+// 7. PULSANTE VERDE: VISTA A RAGGI X
+//    Mostra come è costruita la pagina: per ogni elemento HTML misuro dove si trova
+//    e ci disegno sopra un rettangolo con il suo nome (come gli strumenti da sviluppatore)
+
+// Gli elementi da mostrare (quelli che danno la struttura alla pagina)
+const ELEMENTI_RAGGI_X = "header, nav, main, section, article, footer, h1, h2, h3, p, img, dl, div[id]";
+let raggiAttivi = false;
+
+// Il nome da scrivere sul rettangolo: il tag, più l'id (#) o la prima classe (.)
+function nomeElemento(elemento) {
+  let nome = elemento.tagName.toLowerCase();
+  if (elemento.id) {
+    nome += "#" + elemento.id;
+  } else if (elemento.classList.length > 0) {
+    nome += "." + elemento.classList[0];
+  }
+  return nome;
+}
+
+function attivaRaggiX() {
+  // Uno "strato" trasparente sopra la pagina, dove disegno i rettangoli
+  const strato = document.createElement("div");
+  strato.id = "strato-raggi-x";
+
+  let contati = 0;
+  document.querySelectorAll(ELEMENTI_RAGGI_X).forEach(function (elemento) {
+    const misure = elemento.getBoundingClientRect();   // posizione e grandezza dell'elemento
+    const nascosto = getComputedStyle(elemento).visibility === "hidden";
+    if (misure.width === 0 || misure.height === 0 || nascosto) return;   // salto quelli che non si vedono
+
+    const rettangolo = document.createElement("div");
+    rettangolo.className = "rettangolo-raggi-x";
+
+    // I contenitori (section, div, article...) hanno l'etichetta SOPRA il rettangolo,
+    // i contenuti (titoli, paragrafi, immagini) DENTRO: così le etichette non si sovrappongono.
+    // (se il contenitore è proprio in cima alla pagina, l'etichetta resta dentro per non uscire)
+    const contenitore = ["HEADER", "NAV", "MAIN", "SECTION", "ARTICLE", "FOOTER", "DIV"].includes(elemento.tagName);
+    if (contenitore && misure.top + window.scrollY > 20) {
+      rettangolo.classList.add("contenitore");
+    }
+    // aggiungo lo scroll, così il rettangolo resta sopra l'elemento anche scorrendo la pagina
+    rettangolo.style.left = (misure.left + window.scrollX) + "px";
+    rettangolo.style.top = (misure.top + window.scrollY) + "px";
+    rettangolo.style.width = misure.width + "px";
+    rettangolo.style.height = misure.height + "px";
+
+    const nome = document.createElement("span");
+    nome.textContent = nomeElemento(elemento);
+
+    rettangolo.appendChild(nome);
+    strato.appendChild(rettangolo);
+    contati++;
+  });
+
+  // Barra in basso che spiega cosa sta succedendo
+  const barra = document.createElement("div");
+  barra.className = "barra-raggi-x";
+  barra.textContent = "RAGGI X ATTIVI · " + contati + " elementi HTML · premi il pulsante verde o Esc per uscire";
+  strato.appendChild(barra);
+
+  document.body.appendChild(strato);
+  document.body.classList.add("raggi-x");
+  raggiAttivi = true;
+}
+
+function disattivaRaggiX() {
+  const strato = document.getElementById("strato-raggi-x");
+  if (strato) strato.remove();
+  document.body.classList.remove("raggi-x");
+  raggiAttivi = false;
+}
+
+// Il pulsante verde accende i raggi X se sono spenti, e li spegne se sono accesi
+function cambiaRaggiX() {
+  if (raggiAttivi) {
+    disattivaRaggiX();
+  } else {
+    attivaRaggiX();
+  }
+}
+
+// Esc spegne i raggi X; se la finestra cambia grandezza, ridisegno i rettangoli
+document.addEventListener("keydown", function (evento) {
+  if (evento.key === "Escape" && raggiAttivi) disattivaRaggiX();
+});
+
+window.addEventListener("resize", function () {
+  if (raggiAttivi) {
+    disattivaRaggiX();
+    attivaRaggiX();
+  }
+});
+
+
+// 8. PARTENZA: preparo menu ed easter egg (ci sono in tutte le pagine),
 //    poi capisco in che pagina sono e avvio quella giusta
 preparaMenu();
 preparaEasterEgg();

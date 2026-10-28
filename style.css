@@ -211,7 +211,7 @@ h2::before {
 
 .pulsante.rosso::before  { content: "×"; }
 .pulsante.giallo::before { content: "−"; }
-.pulsante.verde::before  { content: "+"; }
+.pulsante.verde::before  { content: "x"; }   /* x come raggi X */
 
 .pulsanti-finestra:hover .pulsante::before {
   opacity: 1;
@@ -225,20 +225,6 @@ h2::before {
 
 .terminale.ridotto .contenuto-terminale {
   display: none;
-}
-
-/* Terminale INGRANDITO (verde): copre tutto lo schermo */
-.terminale.ingrandito {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin: 0;
-  padding: 56px 8vw;
-  border-radius: 0;
-  animation: appari 0.2s ease;
 }
 
 /* Terminale che SI CHIUDE (rosso): rimpicciolisce e sparisce */
@@ -935,6 +921,65 @@ h2::before {
 
 .pioggia.sfuma {
   opacity: 0;
+}
+
+/* 18b. PULSANTE VERDE: VISTA A RAGGI X */
+/* Lo strato sopra la pagina: non blocca i clic, così si può continuare a usare il sito */
+#strato-raggi-x {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+/* Un rettangolo tratteggiato verde per ogni elemento HTML */
+.rettangolo-raggi-x {
+  position: absolute;
+  border: 1px dashed rgba(0, 255, 65, 0.7);
+  background: rgba(0, 255, 65, 0.03);
+  animation: appari 0.3s ease;
+}
+
+/* L'etichetta con il nome del tag, nell'angolo in alto a sinistra */
+.rettangolo-raggi-x span {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  padding: 1px 5px;
+  background: var(--verde);
+  color: var(--sfondo);
+  font: 700 10px/1.4 var(--mono);
+  white-space: nowrap;
+}
+
+/* Per i contenitori l'etichetta va sopra il rettangolo, con un verde più scuro */
+.rettangolo-raggi-x.contenitore span {
+  top: -16px;
+  background: #0b5d22;
+  color: var(--verde);
+}
+
+/* La barra in basso al centro che spiega la modalità */
+.barra-raggi-x {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  padding: 10px 18px;
+  background: var(--sfondo);
+  border: 1px solid var(--verde);
+  border-radius: 999px;
+  box-shadow: var(--bagliore);
+  color: var(--verde);
+  font: 0.8rem var(--mono);
+  text-align: center;
+}
+
+/* Mentre i raggi X sono accesi, il pulsante verde resta illuminato */
+.raggi-x #raggi-x {
+  box-shadow: 0 0 0 3px rgba(0, 255, 65, 0.35), var(--bagliore);
 }
 
 /* 19. TELEFONO (schermi stretti) */
