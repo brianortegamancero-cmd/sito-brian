@@ -1,0 +1,987 @@
+/* =====================================================
+   style.css – grafica comune a tutto il sito
+   Tema: "il sito come un dispositivo in assistenza"
+   Stile: tutto nero, scritte bianche, dettagli verdi (CMD / Matrix)
+   ===================================================== */
+
+/* Font: Inter per i testi, JetBrains Mono per lo stile terminale
+   (li carica l'HTML con <link>: è più veloce di @import qui dentro) */
+
+/* 1. COLORI (cambiandoli qui cambiano in tutto il sito) */
+:root {
+  --sfondo: #000000;      /* sfondo della pagina: nero */
+  --superficie: #0a0d0a;  /* riquadri e card: nero appena più chiaro */
+  --fascia: #0f1a11;      /* parti alte dei ticket: nero verdastro */
+  --bianco: #ffffff;      /* titoli e scritte importanti */
+  --testo: #e6e6e6;       /* testo normale: bianco morbido */
+  --grigio: #8a9a8c;      /* scritte secondarie */
+  --bordo: #1c2b1f;       /* bordi: verde molto scuro */
+  --verde: #00ff41;       /* verde Matrix */
+  --verde-tenue: rgba(0, 255, 65, 0.12);  /* verde trasparente per gli sfondi delle pastiglie */
+  --bagliore: 0 0 8px rgba(0, 255, 65, 0.5); /* luce verde intorno alle scritte, come un vecchio monitor */
+  --mono: "JetBrains Mono", Consolas, monospace;
+}
+
+/* 2. BASE */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;               /* menu, contenuto e footer uno sotto l'altro */
+  flex-direction: column;
+  min-height: 100vh;           /* la pagina è alta almeno quanto lo schermo */
+  margin: 0;
+  font-family: "Inter", Arial, sans-serif;
+  background: var(--sfondo);
+  color: var(--testo);
+  line-height: 1.6;
+}
+
+/* Testo selezionato col mouse: verde con scritta nera, come nel terminale */
+::selection {
+  background: var(--verde);
+  color: var(--sfondo);
+}
+
+main {
+  flex: 1;                     /* il contenuto si allarga: così il footer resta sempre in fondo */
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
+}
+
+h1, h2, h3 {
+  color: var(--bianco);
+}
+
+/* Titoli delle sezioni con "// " davanti, come un commento nel codice */
+h2 {
+  font-size: 1.6rem;
+  margin: 48px 0 20px;
+}
+
+h2::before {
+  content: "// ";
+  color: var(--verde);
+  font-family: var(--mono);
+  text-shadow: var(--bagliore);
+}
+
+/* 3. MENU */
+.menu {
+  position: sticky;      /* resta in alto quando scorri */
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--sfondo);
+  border-bottom: 1px solid var(--bordo);
+}
+
+/* Il logo Bryant Developer (la formica) */
+.logo {
+  display: block;
+  line-height: 0;                /* niente spazio vuoto sotto l'immagine */
+}
+
+.logo img {
+  display: block;
+  height: 48px;
+  width: auto;
+  transition: filter 0.2s;
+}
+
+/* Passando sopra al logo, la formica si illumina */
+.logo:hover img {
+  filter: drop-shadow(0 0 6px rgba(0, 255, 65, 0.6));
+}
+
+.menu nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+}
+
+/* Ogni voce del menu ha un interruttore stile iPhone davanti */
+.menu nav a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--testo);
+  text-decoration: none;
+}
+
+/* La "pista" dell'interruttore: grigia quando è spento */
+.menu nav a::before {
+  content: "";
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  background: #3a3a3c;
+  transition: background 0.25s;
+}
+
+/* Il pallino bianco che scorre */
+.menu nav a::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  border-radius: 50%;
+  background: var(--bianco);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  transition: transform 0.25s;
+}
+
+.menu nav a:hover::before {
+  background: #4a4a4d;
+}
+
+/* Pagina attiva: interruttore acceso (verde, pallino a destra) */
+.menu nav a.attivo {
+  color: var(--verde);
+  text-shadow: var(--bagliore);
+}
+
+.menu nav a.attivo::before {
+  background: var(--verde);
+  box-shadow: var(--bagliore);
+}
+
+.menu nav a.attivo::after {
+  transform: translateX(14px);
+}
+
+/* 4. TERMINALE (solo Home) */
+.terminale {
+  position: relative;
+  margin: 32px 0;
+  padding: 56px 32px 40px;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+  font-family: var(--mono);
+  color: var(--verde);
+  text-shadow: var(--bagliore);
+}
+
+/* I tre pulsanti della finestra: rosso chiudi, giallo riduci, verde ingrandisci */
+.pulsanti-finestra {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  display: flex;
+  gap: 8px;
+}
+
+.pulsante {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.pulsante.rosso  { background: #ff5f56; }
+.pulsante.giallo { background: #ffbd2e; }
+.pulsante.verde  { background: #27c93f; }
+
+/* Passando sopra ai pulsanti compaiono i simboli × − +, come su Mac */
+.pulsante::before {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.6);
+  font: 700 11px/1 var(--mono);
+  text-shadow: none;
+  opacity: 0;
+}
+
+.pulsante.rosso::before  { content: "×"; }
+.pulsante.giallo::before { content: "−"; }
+.pulsante.verde::before  { content: "+"; }
+
+.pulsanti-finestra:hover .pulsante::before {
+  opacity: 1;
+}
+
+/* Terminale RIDOTTO (giallo): resta solo la barra con i pulsanti */
+.terminale.ridotto {
+  height: 48px;
+  padding: 0;
+}
+
+.terminale.ridotto .contenuto-terminale {
+  display: none;
+}
+
+/* Terminale INGRANDITO (verde): copre tutto lo schermo */
+.terminale.ingrandito {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
+  padding: 56px 8vw;
+  border-radius: 0;
+  animation: appari 0.2s ease;
+}
+
+/* Terminale che SI CHIUDE (rosso): rimpicciolisce e sparisce */
+.terminale.si-chiude {
+  animation: chiusura 0.3s ease forwards;
+}
+
+/* Il tasto per riaprire il terminale dopo averlo chiuso */
+.riapri {
+  display: block;
+  width: 100%;
+  margin: 32px 0;
+  padding: 16px;
+  background: transparent;
+  border: 1px dashed var(--bordo);
+  border-radius: 12px;
+  color: var(--verde);
+  font: 1rem var(--mono);
+  text-shadow: var(--bagliore);
+  cursor: pointer;
+  animation: appari 0.3s ease;
+}
+
+.riapri:hover {
+  border-color: var(--verde);
+}
+
+/* Finché il terminale è aperto, il tasto "riapri" non si vede */
+.riapri[hidden] {
+  display: none;
+}
+
+#righe-avvio p {
+  margin: 4px 0;
+  opacity: 0.8;
+  animation: appari 0.3s ease;
+}
+
+#nome {
+  min-height: 1.2em;     /* lo spazio c'è già prima che il nome si scriva */
+  margin: 28px 0 4px;
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  line-height: 1.2;
+  color: var(--bianco);
+  text-shadow: 0 0 14px rgba(0, 255, 65, 0.35);
+}
+
+/* Cursore lampeggiante dopo il nome */
+#nome::after {
+  content: "_";
+  color: var(--verde);
+  animation: lampeggia 1s steps(1) infinite;
+}
+
+#ruolo {
+  min-height: 1.6em;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* HOME: presentazione, passioni e competenze restano nascoste finché il terminale
+   non ha finito di scrivere il nome. Poi script.js aggiunge la classe "avviato" al body
+   e compaiono una alla volta, salendo leggermente */
+.dopo-avvio {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease, visibility 0.6s;
+}
+
+.avviato .dopo-avvio {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+}
+
+/* La seconda e la terza parte partono un po' dopo, così escono una dopo l'altra */
+.avviato .dopo-avvio.secondo { transition-delay: 0.3s; }
+.avviato .dopo-avvio.terzo   { transition-delay: 0.6s; }
+
+/* 5. PRESENTAZIONE */
+.presentazione {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 32px;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+}
+
+#foto {
+  flex-shrink: 0;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;     /* la foto riempie il cerchio senza deformarsi */
+  border: 3px solid var(--verde);
+  box-shadow: var(--bagliore);
+  background: var(--bordo);
+}
+
+/* Finché la foto non arriva dal foglio (l'immagine non ha ancora un src):
+   niente scritta, solo il cerchio che "respira" piano */
+#foto:not([src]) {
+  color: transparent;            /* nasconde la scritta "Foto di Brian Ortega" */
+  animation: respiro 1.5s ease-in-out infinite;
+}
+
+.presentazione p {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+/* 6. CARD DELLE PASSIONI */
+.griglia {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  overflow: hidden;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+/* Al passaggio del mouse la card sale e il bordo si accende di verde */
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--verde);
+}
+
+.card img {
+  display: block;
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background: var(--bordo);
+}
+
+.card h3 {
+  margin: 16px 20px 8px;
+}
+
+.card p {
+  margin: 0 20px 20px;
+  color: var(--grigio);
+}
+
+/* 7. COMPETENZE COME BATTERIE */
+.competenza {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  padding: 16px 20px;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+}
+
+.nome-competenza {
+  flex: 1;
+  font-weight: 600;
+}
+
+.batteria {
+  position: relative;
+  width: 180px;
+  height: 26px;
+  padding: 3px;
+  border: 2px solid var(--testo);
+  border-radius: 6px;
+}
+
+/* Il "polo" della batteria a destra */
+.batteria::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: -7px;
+  width: 4px;
+  height: 10px;
+  background: var(--testo);
+  border-radius: 0 2px 2px 0;
+}
+
+.carica {
+  height: 100%;
+  background: var(--verde);
+  border-radius: 3px;
+  box-shadow: var(--bagliore);
+  /* parte dopo 0,9 secondi (il tempo che compaia la sezione) e fino ad allora resta vuota */
+  animation: ricarica 1.5s ease-out 0.9s backwards;
+}
+
+.percentuale {
+  width: 48px;
+  text-align: right;
+  font-family: var(--mono);
+  color: var(--grigio);
+}
+
+/* 8. MESSAGGIO D'ERRORE (rosso, come un errore nel terminale) */
+.errore {
+  margin-top: 32px;
+  padding: 16px 20px;
+  background: #1a0606;
+  color: #ff5f56;
+  border-left: 4px solid #ff5f56;
+  font-family: var(--mono);
+}
+
+/* 9. FOOTER */
+.footer {
+  margin-top: 48px;
+  padding: 32px 24px 20px;
+  background: var(--sfondo);
+  border-top: 1px solid var(--bordo);
+  color: var(--grigio);
+  font-size: 0.9rem;
+}
+
+.footer p {
+  margin: 0;
+}
+
+/* Tre blocchi in fila: chi sono, GitHub, la scuola */
+.footer-contenuto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.footer-chi {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-formica {
+  width: 40px;
+  height: 40px;
+}
+
+.footer-nome {
+  color: var(--bianco);
+  font-weight: 600;
+}
+
+/* Il link a GitHub come una pastiglia che si accende di verde */
+.footer-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border: 1px solid var(--bordo);
+  border-radius: 999px;
+  color: var(--testo);
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.footer-github:hover {
+  border-color: var(--verde);
+  color: var(--verde);
+}
+
+.footer-scuola {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* Il logo della scuola su una targhetta bianca:
+   così i suoi colori originali si leggono bene e non lo modifico */
+.logo-scuola {
+  height: 58px;
+  width: auto;
+  padding: 6px 10px;
+  background: var(--bianco);
+  border-radius: 8px;
+}
+
+/* (con .footer davanti, se no la regola ".footer p" gli toglierebbe i margini) */
+.footer .footer-fondo {
+  max-width: 1000px;
+  margin: 24px auto 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--bordo);
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+/* 10. TITOLO DELLE PAGINE INTERNE (CV, Stage, Lavori, Extra) */
+.titolo-pagina {
+  margin: 48px 0 0;
+  font-family: var(--mono);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1.2;
+}
+
+.titolo-pagina::before {
+  content: "> ";
+  color: var(--verde);
+  text-shadow: var(--bagliore);
+}
+
+/* Cursore lampeggiante, come nella Home */
+.titolo-pagina::after {
+  content: "_";
+  color: var(--verde);
+  animation: lampeggia 1s steps(1) infinite;
+}
+
+/* 11. LINEA DEL TEMPO (CV: lavoro e istruzione) */
+.timeline {
+  margin-left: 8px;              /* spazio per i pallini che escono a sinistra */
+  padding-left: 28px;
+  border-left: 2px solid var(--bordo);   /* la linea verticale */
+}
+
+.tappa {
+  position: relative;
+  margin-bottom: 16px;
+  padding: 20px 24px;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+  animation: appari 0.4s ease;
+}
+
+.tappa:last-child {
+  margin-bottom: 0;
+}
+
+/* Il pallino sulla linea, all'altezza del periodo */
+.tappa::before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  left: -37px;                   /* lo porta sopra la linea verticale */
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--sfondo);
+  border: 3px solid var(--verde);
+}
+
+/* Quello che sto facendo adesso: pallino pieno che pulsa, come un LED acceso */
+.tappa.in-corso::before {
+  background: var(--verde);
+  animation: impulso 2s infinite;
+}
+
+.periodo {
+  margin: 0 0 4px;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: var(--verde);
+}
+
+.tappa h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.luogo {
+  margin: 2px 0 0;
+  color: var(--grigio);
+}
+
+.descrizione {
+  margin: 12px 0 0;
+}
+
+/* 12. ETICHETTE (competenze trasversali) */
+.etichette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.etichetta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 999px;          /* bordi tutti tondi */
+  font-weight: 600;
+}
+
+/* La lucina verde davanti a ogni etichetta */
+.etichetta::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--verde);
+  box-shadow: var(--bagliore);
+}
+
+/* 13. LINGUE */
+.lingue {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.lingua {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+}
+
+.nome-lingua {
+  font-weight: 600;
+}
+
+.livello {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--verde);
+}
+
+/* MESSAGGIO DI CARICAMENTO: si vede solo mentre i dati arrivano dal foglio */
+.caricamento {
+  margin: 8px 0 0;
+  font-family: var(--mono);
+  color: var(--verde);
+  text-shadow: var(--bagliore);
+}
+
+.caricamento::before {
+  content: "> ";
+}
+
+/* Cursore che lampeggia: fa capire che sta lavorando */
+.caricamento::after {
+  content: "_";
+  animation: lampeggia 1s steps(1) infinite;
+}
+
+.caricamento[hidden] {
+  display: none;
+}
+
+/* 14. RIEPILOGO SOTTO IL TITOLO (es. "Ticket trovati: 2") */
+.riepilogo {
+  min-height: 1.6em;             /* lo spazio c'è già prima che arrivino i dati */
+  margin: 8px 0 0;
+  font-family: var(--mono);
+  color: var(--grigio);
+}
+
+/* 15. TICKET DI ASSISTENZA (pagina Stage) */
+.griglia-ticket {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.ticket {
+  overflow: hidden;              /* la parte alta segue gli angoli tondi */
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+  transition: transform 0.2s, border-color 0.2s;
+  animation: appari 0.4s ease;
+}
+
+.ticket:hover {
+  transform: translateY(-4px);
+  border-color: var(--verde);
+}
+
+/* Parte alta del ticket: numero e stato */
+.ticket-testa {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  background: var(--fascia);
+  border-bottom: 1px solid var(--bordo);
+  font-family: var(--mono);
+}
+
+.numero-ticket {
+  color: var(--bianco);
+  font-weight: 700;
+}
+
+/* Lo stato: pastiglia verde con la lucina, come un LED acceso */
+.stato {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--verde-tenue);
+  color: var(--verde);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.stato::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--verde);
+  box-shadow: var(--bagliore);
+}
+
+.ticket-corpo {
+  padding: 24px;
+}
+
+.ticket-corpo h3 {
+  margin: 0 0 16px;
+  font-size: 1.2rem;
+}
+
+/* Dettagli in due colonne: etichetta a sinistra, valore a destra */
+.ticket-corpo dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 10px 20px;
+  margin: 0;
+}
+
+.ticket-corpo dt {
+  padding-top: 2px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--grigio);
+}
+
+.ticket-corpo dd {
+  margin: 0;
+}
+
+/* 16. ANIMAZIONI */
+@keyframes appari {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+@keyframes lampeggia {
+  50% { opacity: 0; }
+}
+
+@keyframes ricarica {
+  from { width: 0; }    /* la batteria parte vuota e si carica */
+}
+
+@keyframes respiro {
+  50% { opacity: 0.4; }
+}
+
+@keyframes chiusura {
+  to { opacity: 0; transform: scale(0.92); }
+}
+
+@keyframes impulso {
+  from { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.6); }
+  to   { box-shadow: 0 0 0 10px rgba(0, 255, 65, 0); }
+}
+
+/* 17. EASTER EGG: CMD SEGRETO (si apre con 4 clic sul logo) */
+.cmd-sfondo {
+  position: fixed;              /* copre tutta la pagina */
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.cmd-sfondo[hidden] {
+  display: none;                /* quando è chiuso non si vede */
+}
+
+.cmd-finestra {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 720px;
+  height: 70vh;
+  max-height: 480px;
+  overflow: hidden;
+  background: #0c0c0c;          /* il nero del CMD di Windows */
+  border: 1px solid var(--bordo);
+  border-radius: 8px;
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.15);
+  font-family: var(--mono);
+  animation: appari 0.2s ease;
+}
+
+.cmd-barra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 6px 6px 14px;
+  background: #1f1f1f;
+  color: var(--testo);
+  font-size: 0.85rem;
+}
+
+.cmd-chiudi {
+  padding: 4px 12px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--testo);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* La X diventa rossa, come in Windows */
+.cmd-chiudi:hover {
+  background: #e81123;
+  color: var(--bianco);
+}
+
+.cmd-schermo {
+  flex: 1;
+  overflow-y: auto;             /* se le righe sono tante, si scorre */
+  padding: 12px 16px;
+  color: #cccccc;
+  font-size: 0.9rem;
+  cursor: text;
+}
+
+.cmd-schermo p {
+  margin: 0;
+  white-space: pre-wrap;        /* rispetta gli "a capo" e gli spazi */
+}
+
+.cmd-verde {
+  color: var(--verde);
+  text-shadow: var(--bagliore);
+}
+
+.cmd-input {
+  display: flex;
+}
+
+.cmd-input label {
+  white-space: nowrap;
+}
+
+.cmd-input input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--bianco);
+  font: inherit;
+  caret-color: var(--verde);    /* cursore verde */
+}
+
+/* 18. EASTER EGG: PIOGGIA MATRIX */
+.pioggia {
+  position: fixed;
+  inset: 0;
+  z-index: 200;                 /* sopra a tutto, anche al CMD */
+  pointer-events: none;         /* non blocca i clic */
+  transition: opacity 1s;
+}
+
+.pioggia.sfuma {
+  opacity: 0;
+}
+
+/* 19. TELEFONO (schermi stretti) */
+@media (max-width: 700px) {
+  .menu {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .menu nav {
+    justify-content: center;
+    gap: 10px 16px;
+  }
+
+  .terminale {
+    padding: 48px 20px 32px;
+    font-size: 0.8rem;   /* così le righe di diagnostica non vanno a capo */
+  }
+
+  .presentazione {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .competenza {
+    flex-wrap: wrap;
+  }
+
+  .nome-competenza {
+    flex-basis: 100%;
+  }
+
+  .batteria {
+    flex: 1;
+  }
+
+  .titolo-pagina {
+    margin-top: 32px;
+  }
+
+  /* Footer: i tre blocchi uno sotto l'altro, centrati */
+  .footer-contenuto {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-scuola {
+    align-items: center;
+  }
+}

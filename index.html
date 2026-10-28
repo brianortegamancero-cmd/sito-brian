@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brian Ortega | Home</title>
+  <!-- Font: mi collego in anticipo ai server di Google, così i caratteri arrivano prima -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://docs.google.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <!-- Icona nella scheda del browser: la formica del logo -->
+  <link rel="icon" href="img/icona.svg" type="image/svg+xml">
+</head>
+<body class="pagina-home">
+
+  <!-- MENU in alto: uguale in tutte le pagine -->
+  <header class="menu">
+    <a href="index.html" class="logo"><img src="img/logo.svg" alt="Bryant Developer"></a>
+    <nav>
+      <a href="index.html" class="attivo">Home</a>
+      <a href="cv.html">CV</a>
+      <a href="stage.html">Stage</a>
+      <a href="lavori.html">Lavori</a>
+      <a href="extra.html">Extra</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 1. TERMINALE: le righe arrivano dal foglio (sezione "avvio") -->
+    <section class="terminale" id="terminale">
+      <!-- I tre pulsanti della finestra: funzionano davvero (li comanda script.js) -->
+      <div class="pulsanti-finestra">
+        <button class="pulsante rosso" id="chiudi-terminale" aria-label="Chiudi il terminale" title="Chiudi"></button>
+        <button class="pulsante giallo" id="riduci-terminale" aria-label="Riduci il terminale" title="Riduci"></button>
+        <button class="pulsante verde" id="ingrandisci-terminale" aria-label="Ingrandisci il terminale" title="Ingrandisci"></button>
+      </div>
+
+      <div class="contenuto-terminale">
+        <!-- Si vede solo mentre i dati arrivano dal foglio -->
+        <p id="caricamento" class="caricamento">Connessione al server in corso</p>
+        <div id="righe-avvio"></div>
+        <h1 id="nome"></h1>
+        <p id="ruolo"></p>
+      </div>
+    </section>
+
+    <!-- Compare solo quando il terminale è stato chiuso con il pulsante rosso -->
+    <button id="riapri-terminale" class="riapri" hidden>&gt; riapri il terminale</button>
+
+    <!-- Le parti con "dopo-avvio" compaiono solo quando il terminale ha finito di scrivere il nome -->
+
+    <!-- 2. PRESENTAZIONE: foto e testo arrivano dal foglio -->
+    <section class="presentazione dopo-avvio">
+      <img id="foto" alt="Foto di Brian Ortega">
+      <p id="testo-presentazione"></p>
+    </section>
+
+    <!-- 3. PASSIONI: le card le crea script.js -->
+    <section class="dopo-avvio secondo">
+      <h2>Le mie passioni</h2>
+      <div id="passioni" class="griglia"></div>
+    </section>
+
+    <!-- 4. COMPETENZE: le batterie le crea script.js -->
+    <section class="dopo-avvio terzo">
+      <h2>Competenze</h2>
+      <div id="competenze"></div>
+    </section>
+
+    <!-- Messaggio che compare solo se il foglio non si carica -->
+    <p id="errore" class="errore" hidden>Errore: dati non trovati. Riprova più tardi.</p>
+  </main>
+
+  <!-- FOOTER: uguale in tutte le pagine -->
+  <footer class="footer">
+    <div class="footer-contenuto">
+      <!-- Chi sono -->
+      <div class="footer-chi">
+        <img src="img/icona.svg" alt="" class="footer-formica">
+        <div>
+          <p class="footer-nome">Brian Ortega</p>
+          <p>Operatore informatico · Milano</p>
+        </div>
+      </div>
+
+      <!-- Contatto: il mio codice su GitHub (si apre in una nuova scheda) -->
+      <a class="footer-github" href="https://github.com/brianortegamancero-cmd" target="_blank" rel="noopener">
+        <img src="img/github.svg" alt="" width="20" height="20">
+        <span>github.com/brianortegamancero-cmd</span>
+      </a>
+
+      <!-- La scuola -->
+      <div class="footer-scuola">
+        <p>Progetto d'esame realizzato al</p>
+        <img src="img/logo-scuola.webp" alt="CFP Immaginazione e Lavoro" class="logo-scuola">
+      </div>
+    </div>
+
+    <p class="footer-fondo">© 2026 Brian Ortega · Realizzato in HTML, CSS e JavaScript · BrainOS v1.0</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

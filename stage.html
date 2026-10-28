@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brian Ortega | Stage</title>
+  <!-- Font: mi collego in anticipo ai server di Google, così i caratteri arrivano prima -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://docs.google.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <!-- Icona nella scheda del browser: la formica del logo -->
+  <link rel="icon" href="img/icona.svg" type="image/svg+xml">
+</head>
+<body class="pagina-stage">
+
+  <!-- MENU in alto: uguale in tutte le pagine -->
+  <header class="menu">
+    <a href="index.html" class="logo"><img src="img/logo.svg" alt="Bryant Developer"></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="cv.html">CV</a>
+      <a href="stage.html" class="attivo">Stage</a>
+      <a href="lavori.html">Lavori</a>
+      <a href="extra.html">Extra</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Titolo della pagina e riepilogo (il numero dei ticket lo scrive script.js) -->
+    <h1 class="titolo-pagina">Stage</h1>
+    <!-- Si vede solo mentre i dati arrivano dal foglio -->
+    <p id="caricamento" class="caricamento">Caricamento dati in corso</p>
+    <p id="riepilogo" class="riepilogo"></p>
+
+    <!-- TICKET: uno per ogni stage, li crea script.js (tab STAGE del foglio) -->
+    <section>
+      <h2>Storico interventi</h2>
+      <div id="ticket" class="griglia-ticket"></div>
+    </section>
+
+    <!-- Messaggio che compare solo se il foglio non si carica -->
+    <p id="errore" class="errore" hidden>Errore: dati non trovati. Riprova più tardi.</p>
+  </main>
+
+  <!-- FOOTER: uguale in tutte le pagine -->
+  <footer class="footer">
+    <div class="footer-contenuto">
+      <!-- Chi sono -->
+      <div class="footer-chi">
+        <img src="img/icona.svg" alt="" class="footer-formica">
+        <div>
+          <p class="footer-nome">Brian Ortega</p>
+          <p>Operatore informatico · Milano</p>
+        </div>
+      </div>
+
+      <!-- Contatto: il mio codice su GitHub (si apre in una nuova scheda) -->
+      <a class="footer-github" href="https://github.com/brianortegamancero-cmd" target="_blank" rel="noopener">
+        <img src="img/github.svg" alt="" width="20" height="20">
+        <span>github.com/brianortegamancero-cmd</span>
+      </a>
+
+      <!-- La scuola -->
+      <div class="footer-scuola">
+        <p>Progetto d'esame realizzato al</p>
+        <img src="img/logo-scuola.webp" alt="CFP Immaginazione e Lavoro" class="logo-scuola">
+      </div>
+    </div>
+
+    <p class="footer-fondo">© 2026 Brian Ortega · Realizzato in HTML, CSS e JavaScript · BrainOS v1.0</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brian Ortega | CV</title>
+  <!-- Font: mi collego in anticipo ai server di Google, così i caratteri arrivano prima -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://docs.google.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <!-- Icona nella scheda del browser: la formica del logo -->
+  <link rel="icon" href="img/icona.svg" type="image/svg+xml">
+</head>
+<body class="pagina-cv">
+
+  <!-- MENU in alto: uguale in tutte le pagine -->
+  <header class="menu">
+    <a href="index.html" class="logo"><img src="img/logo.svg" alt="Bryant Developer"></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="cv.html" class="attivo">CV</a>
+      <a href="stage.html">Stage</a>
+      <a href="lavori.html">Lavori</a>
+      <a href="extra.html">Extra</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Titolo della pagina (con il cursore che lampeggia, come nella Home) -->
+    <h1 class="titolo-pagina">Curriculum</h1>
+    <!-- Si vede solo mentre i dati arrivano dal foglio -->
+    <p id="caricamento" class="caricamento">Caricamento dati in corso</p>
+
+    <!-- 1. ESPERIENZE (lavoro e tirocini): le tappe le crea script.js (sezione "lavoro" del foglio) -->
+    <section>
+      <h2>Esperienze e tirocini</h2>
+      <div id="lavoro" class="timeline"></div>
+    </section>
+
+    <!-- 2. ISTRUZIONE: le tappe le crea script.js (sezione "istruzione") -->
+    <section>
+      <h2>Istruzione e formazione</h2>
+      <div id="istruzione" class="timeline"></div>
+    </section>
+
+    <!-- 3. COMPETENZE TRASVERSALI: le etichette le crea script.js -->
+    <section>
+      <h2>Competenze trasversali</h2>
+      <div id="trasversali" class="etichette"></div>
+    </section>
+
+    <!-- 4. LINGUE: le crea script.js -->
+    <section>
+      <h2>Lingue</h2>
+      <div id="lingue" class="lingue"></div>
+    </section>
+
+    <!-- Messaggio che compare solo se il foglio non si carica -->
+    <p id="errore" class="errore" hidden>Errore: dati non trovati. Riprova più tardi.</p>
+  </main>
+
+  <!-- FOOTER: uguale in tutte le pagine -->
+  <footer class="footer">
+    <div class="footer-contenuto">
+      <!-- Chi sono -->
+      <div class="footer-chi">
+        <img src="img/icona.svg" alt="" class="footer-formica">
+        <div>
+          <p class="footer-nome">Brian Ortega</p>
+          <p>Operatore informatico · Milano</p>
+        </div>
+      </div>
+
+      <!-- Contatto: il mio codice su GitHub (si apre in una nuova scheda) -->
+      <a class="footer-github" href="https://github.com/brianortegamancero-cmd" target="_blank" rel="noopener">
+        <img src="img/github.svg" alt="" width="20" height="20">
+        <span>github.com/brianortegamancero-cmd</span>
+      </a>
+
+      <!-- La scuola -->
+      <div class="footer-scuola">
+        <p>Progetto d'esame realizzato al</p>
+        <img src="img/logo-scuola.webp" alt="CFP Immaginazione e Lavoro" class="logo-scuola">
+      </div>
+    </div>
+
+    <p class="footer-fondo">© 2026 Brian Ortega · Realizzato in HTML, CSS e JavaScript · BrainOS v1.0</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
