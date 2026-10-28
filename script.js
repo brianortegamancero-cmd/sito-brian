@@ -196,26 +196,12 @@ function creaCompetenze(lista) {
 }
 
 // I tre pulsanti della finestra del terminale:
-// rosso = chiudi, giallo = riduci, verde = vista a raggi X (vedi la sezione 7)
+// rosso = il sistema crolla (sezione 8), giallo = riduci, verde = vista a raggi X (sezione 7)
 function preparaFinestraTerminale() {
   const terminale = document.getElementById("terminale");
-  const riapri = document.getElementById("riapri-terminale");
 
-  // ROSSO: il terminale si chiude con un'animazione e compare il tasto per riaprirlo
-  document.getElementById("chiudi-terminale").addEventListener("click", function () {
-    terminale.classList.remove("ridotto");
-    terminale.classList.add("si-chiude");
-    setTimeout(function () {
-      terminale.classList.remove("si-chiude");
-      terminale.hidden = true;
-      riapri.hidden = false;
-    }, 300);
-  });
-
-  riapri.addEventListener("click", function () {
-    riapri.hidden = true;
-    terminale.hidden = false;
-  });
+  // ROSSO: fa crollare tutto il sito
+  document.getElementById("crollo").addEventListener("click", crollaSistema);
 
   // GIALLO: riduce il terminale alla sola barra in alto (premuto di nuovo, lo riapre)
   document.getElementById("riduci-terminale").addEventListener("click", function () {
@@ -790,7 +776,108 @@ window.addEventListener("resize", function () {
 });
 
 
-// 8. PARTENZA: preparo menu ed easter egg (ci sono in tutte le pagine),
+// 8. PULSANTE ROSSO: IL SISTEMA CROLLA
+//    Una finta rottura in 4 tempi: errore nel terminale → glitch → la pagina cade a pezzi
+//    → schermata di errore di BrainOS → riavvio (ricarico la pagina e riparte l'animazione)
+
+let staCrollando = false;   // se si clicca più volte, il crollo parte una volta sola
+
+async function crollaSistema() {
+  if (staCrollando) return;
+  staCrollando = true;
+
+  // tolgo le altre cose eventualmente aperte
+  if (raggiAttivi) disattivaRaggiX();
+  if (cmd) chiudiCmd();
+  const terminale = document.getElementById("terminale");
+  terminale.classList.remove("ridotto");
+
+  // 1. Il terminale scrive l'errore in rosso, una riga alla volta
+  const messaggi = [
+    "ERRORE CRITICO: utente perso",
+    "Tentativo di recupero ......... FALLITO",
+    "Il sistema non risponde"
+  ];
+  const contenuto = terminale.querySelector(".contenuto-terminale");
+  for (const testo of messaggi) {
+    const riga = document.createElement("p");
+    riga.className = "riga-errore";
+    riga.textContent = "> " + testo;
+    contenuto.appendChild(riga);
+    await aspetta(600);
+  }
+
+  // 2. Glitch: la pagina trema e i colori impazziscono
+  document.body.classList.add("glitch");
+  await aspetta(1200);
+  document.body.classList.remove("glitch");
+
+  // 3. I pezzi della pagina cadono, ognuno con una rotazione e un ritardo diversi
+  document.body.classList.add("crollo");   // niente barre di scorrimento mentre cadono
+  const pezzi = document.querySelectorAll("body > header, main > *, body > footer");
+  pezzi.forEach(function (pezzo) {
+    pezzo.style.setProperty("--rotazione", (Math.random() * 60 - 30) + "deg");   // da -30° a +30°
+    pezzo.style.setProperty("--ritardo", (Math.random() * 0.5) + "s");            // da 0 a 0,5 secondi
+    pezzo.classList.add("cade");
+  });
+  await aspetta(2200);
+
+  // 4. Schermata di errore, poi riavvio
+  await schermataErrore();
+  location.reload();
+}
+
+// La schermata blu di BrainOS, come quella di Windows, con la percentuale che sale
+async function schermataErrore() {
+  const schermata = document.createElement("div");
+  schermata.className = "schermata-errore";
+
+  const faccina = document.createElement("p");
+  faccina.className = "faccina";
+  faccina.textContent = ":(";
+
+  const testo = document.createElement("p");
+  testo.className = "testo-errore";
+  testo.textContent = "BrainOS ha riscontrato un problema e deve essere riavviato. " +
+                      "Stiamo raccogliendo alcune informazioni sull'errore, poi il sistema ripartirà da solo.";
+
+  const percentuale = document.createElement("p");
+  percentuale.className = "testo-errore";
+  percentuale.textContent = "0% completato";
+
+  // in basso: la formica al posto del codice QR di Windows, e il codice dell'errore
+  const dettagli = document.createElement("div");
+  dettagli.className = "dettagli-errore";
+
+  const formica = document.createElement("img");
+  formica.src = "img/icona.svg";
+  formica.alt = "";
+
+  const info = document.createElement("p");
+  info.textContent = "Per maggiori informazioni contatta l'amministratore di sistema: Brian\n" +
+                     "Codice di arresto: UTENTE_NON_TROVATO";
+
+  dettagli.append(formica, info);
+  schermata.append(faccina, testo, percentuale, dettagli);
+  document.body.appendChild(schermata);
+
+  // la percentuale sale a scatti, come in Windows
+  let valore = 0;
+  while (valore < 100) {
+    await aspetta(300 + Math.random() * 400);
+    valore = Math.min(100, valore + 5 + Math.floor(Math.random() * 20));
+    percentuale.textContent = valore + "% completato";
+  }
+  await aspetta(700);
+
+  // Riavvio: schermo nero con il cursore che lampeggia
+  schermata.className = "schermata-riavvio";
+  schermata.textContent = "Riavvio in corso";
+  await aspetta(1500);
+}
+
+
+// 9. PARTENZA: preparo menu ed easter egg (ci sono in tutte le pagine),
 //    poi capisco in che pagina sono e avvio quella giusta
 preparaMenu();
 preparaEasterEgg();
