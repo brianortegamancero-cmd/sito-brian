@@ -777,10 +777,19 @@ window.addEventListener("resize", function () {
 
 
 // 8. PULSANTE ROSSO: IL SISTEMA CROLLA
-//    Una finta rottura in 4 tempi: errore nel terminale → glitch → la pagina cade a pezzi
-//    → schermata di errore di BrainOS → riavvio (ricarico la pagina e riparte l'animazione)
+//    Una finta rottura in 4 tempi:
+//    1) compare BrainOS arrabbiato  2) il testo si corrompe e diventa tutto verde
+//    3) lo schermo si spegne come un vecchio monitor  4) schermata d'errore con BrainOS triste
+//    → riavvio (ricarico la pagina e riparte l'animazione)
 
 let staCrollando = false;   // se si clicca più volte, il crollo parte una volta sola
+const CODICE = "アイウエオカキクケコサシスセソ0123456789#$%&@";
+
+// Gli strati sopra la pagina li attacco a <html> e non al <body>,
+// perché durante lo spegnimento il body viene schiacciato e loro devono restare interi
+function aggiungiStrato(elemento) {
+  document.documentElement.appendChild(elemento);
+}
 
 async function crollaSistema() {
   if (staCrollando) return;
@@ -789,83 +798,132 @@ async function crollaSistema() {
   // tolgo le altre cose eventualmente aperte
   if (raggiAttivi) disattivaRaggiX();
   if (cmd) chiudiCmd();
-  const terminale = document.getElementById("terminale");
-  terminale.classList.remove("ridotto");
 
-  // 1. Il terminale scrive l'errore in rosso, una riga alla volta
-  const messaggi = [
-    "ERRORE CRITICO: utente perso",
-    "Tentativo di recupero ......... FALLITO",
-    "Il sistema non risponde"
-  ];
-  const contenuto = terminale.querySelector(".contenuto-terminale");
-  for (const testo of messaggi) {
-    const riga = document.createElement("p");
-    riga.className = "riga-errore";
-    riga.textContent = "> " + testo;
-    contenuto.appendChild(riga);
-    await aspetta(600);
+  // Per chi ha chiesto al computer di ridurre le animazioni: subito la schermata d'errore
+  const pocoMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!pocoMovimento) {
+    await mostraArrabbiato();
+    await corrompiTesto();
+    await spegniSchermo();
   }
-
-  // 2. Glitch: la pagina trema e i colori impazziscono
-  document.body.classList.add("glitch");
-  await aspetta(1200);
-  document.body.classList.remove("glitch");
-
-  // 3. I pezzi della pagina cadono, ognuno con una rotazione e un ritardo diversi
-  document.body.classList.add("crollo");   // niente barre di scorrimento mentre cadono
-  const pezzi = document.querySelectorAll("body > header, main > *, body > footer");
-  pezzi.forEach(function (pezzo) {
-    pezzo.style.setProperty("--rotazione", (Math.random() * 60 - 30) + "deg");   // da -30° a +30°
-    pezzo.style.setProperty("--ritardo", (Math.random() * 0.5) + "s");            // da 0 a 0,5 secondi
-    pezzo.classList.add("cade");
-  });
-  await aspetta(2200);
-
-  // 4. Schermata di errore, poi riavvio
   await schermataErrore();
   location.reload();
 }
 
-// La schermata blu di BrainOS, come quella di Windows, con la percentuale che sale
+// 1. BrainOS arrabbiato al centro dello schermo, che trema
+async function mostraArrabbiato() {
+  const strato = document.createElement("div");
+  strato.className = "strato-arrabbiato";
+
+  const faccia = document.createElement("img");
+  faccia.src = "img/brainos-arrabbiato.svg";
+  faccia.alt = "";
+
+  const titolo = document.createElement("p");
+  titolo.className = "errore-critico";
+  titolo.textContent = "ERRORE CRITICO";
+
+  const sotto = document.createElement("p");
+  sotto.textContent = "utente perso";
+
+  strato.append(faccia, titolo, sotto);
+  aggiungiStrato(strato);
+  await aspetta(1800);
+  strato.remove();
+}
+
+// 2. Tutti i testi della pagina si trasformano, poco alla volta, in caratteri di codice
+async function corrompiTesto() {
+  // raccolgo tutti i pezzi di testo dentro il body (salto quelli vuoti)
+  const testi = [];
+  const giro = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  while (giro.nextNode()) {
+    if (giro.currentNode.textContent.trim() !== "") {
+      testi.push({ nodo: giro.currentNode, originale: giro.currentNode.textContent });
+    }
+  }
+
+  document.body.classList.add("corrotto");   // il CSS colora tutto di verde e fa tremare la pagina
+
+  const durata = 1400;
+  const inizio = performance.now();
+  while (performance.now() - inizio < durata) {
+    // più passa il tempo, più lettere vengono sostituite (da 0% a 100%)
+    const quanto = (performance.now() - inizio) / durata;
+    testi.forEach(function (t) {
+      t.nodo.textContent = t.originale.replace(/\S/g, function (lettera) {
+        return Math.random() < quanto ? CODICE[Math.floor(Math.random() * CODICE.length)] : lettera;
+      });
+    });
+    await aspetta(70);
+  }
+}
+
+// 3. Spegnimento da vecchio monitor: la pagina si schiaccia in una riga,
+//    la riga si accorcia fino a un puntino, il puntino si spegne
+async function spegniSchermo() {
+  // schiaccio il body verso il centro di quello che si vede adesso sullo schermo
+  const centro = window.scrollY + window.innerHeight / 2;
+  document.body.style.transformOrigin = "50% " + centro + "px";
+  document.body.classList.add("si-spegne");
+  await aspetta(450);
+
+  document.body.classList.add("spento");      // nascondo la pagina schiacciata
+  const linea = document.createElement("div");
+  linea.className = "linea-crt";
+  aggiungiStrato(linea);
+  await aspetta(450);
+
+  linea.remove();
+  const punto = document.createElement("div");
+  punto.className = "punto-crt";
+  aggiungiStrato(punto);
+  await aspetta(700);
+  punto.remove();
+}
+
+// 4. Schermata d'errore chiara, con BrainOS triste e la barra che si riempie
 async function schermataErrore() {
   const schermata = document.createElement("div");
   schermata.className = "schermata-errore";
 
-  const faccina = document.createElement("p");
-  faccina.className = "faccina";
-  faccina.textContent = ":(";
+  const faccia = document.createElement("img");
+  faccia.src = "img/brainos-triste.svg";
+  faccia.alt = "";
 
-  const testo = document.createElement("p");
-  testo.className = "testo-errore";
-  testo.textContent = "BrainOS ha riscontrato un problema e deve essere riavviato. " +
-                      "Stiamo raccogliendo alcune informazioni sull'errore, poi il sistema ripartirà da solo.";
+  const titolo = document.createElement("p");
+  titolo.className = "titolo-errore";
+  titolo.textContent = "BrainOS si è bloccato e sta per ripartire.";
+
+  const spiegazione = document.createElement("p");
+  spiegazione.className = "spiegazione-errore";
+  spiegazione.textContent = "Stiamo raccogliendo alcune informazioni sull'errore. Non spegnere il computer.";
+
+  // barra di avanzamento: un contenitore grigio con dentro la parte verde che si allunga
+  const barra = document.createElement("div");
+  barra.className = "barra-errore";
+  const riempimento = document.createElement("div");
+  barra.appendChild(riempimento);
 
   const percentuale = document.createElement("p");
-  percentuale.className = "testo-errore";
+  percentuale.className = "percentuale-errore";
   percentuale.textContent = "0% completato";
 
-  // in basso: la formica al posto del codice QR di Windows, e il codice dell'errore
-  const dettagli = document.createElement("div");
+  const dettagli = document.createElement("p");
   dettagli.className = "dettagli-errore";
+  dettagli.textContent = "Codice di arresto: UTENTE_NON_TROVATO\n" +
+                         "Per assistenza contatta l'amministratore di sistema: Brian";
 
-  const formica = document.createElement("img");
-  formica.src = "img/icona.svg";
-  formica.alt = "";
+  schermata.append(faccia, titolo, spiegazione, barra, percentuale, dettagli);
+  aggiungiStrato(schermata);
 
-  const info = document.createElement("p");
-  info.textContent = "Per maggiori informazioni contatta l'amministratore di sistema: Brian\n" +
-                     "Codice di arresto: UTENTE_NON_TROVATO";
-
-  dettagli.append(formica, info);
-  schermata.append(faccina, testo, percentuale, dettagli);
-  document.body.appendChild(schermata);
-
-  // la percentuale sale a scatti, come in Windows
+  // la percentuale sale a scatti, come nei veri sistemi operativi
   let valore = 0;
   while (valore < 100) {
     await aspetta(300 + Math.random() * 400);
     valore = Math.min(100, valore + 5 + Math.floor(Math.random() * 20));
+    riempimento.style.width = valore + "%";
     percentuale.textContent = valore + "% completato";
   }
   await aspetta(700);
