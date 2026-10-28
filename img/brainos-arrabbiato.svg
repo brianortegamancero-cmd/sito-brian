@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <title>BrainOS arrabbiato</title>
+  <g fill="none" stroke="#00ff41" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 24 L26 10 L18 7 M68 24 L74 10 L82 7"/>
+    <path d="M26 24 L74 24 L80 34 L78 60 L50 94 L22 60 L20 34 Z"/>
+    <path d="M50 24 V31 M26 40 H32 L35 43 M74 40 H68 L65 43 M50 94 V85" stroke-width="2"/>
+    <path d="M39 75 L43 71 L47 75 L50 71 L53 75 L57 71 L61 75" stroke-width="2.6"/>
+  </g>
+  <g fill="#00ff41">
+    <circle cx="18" cy="7" r="3"/>
+    <circle cx="82" cy="7" r="3"/>
+    <circle cx="50" cy="33" r="2.2"/>
+    <circle cx="36" cy="44" r="2"/>
+    <circle cx="64" cy="44" r="2"/>
+    <circle cx="50" cy="83" r="2.2"/>
+    <path d="M29 46 L45 52 L43 56 L31 53 Z M71 46 L55 52 L57 56 L69 53 Z"/>
+  </g>
+</svg>
