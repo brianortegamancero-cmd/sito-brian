@@ -33,7 +33,7 @@
       <!-- I tre pulsanti della finestra: funzionano davvero (li comanda script.js) -->
       <div class="pulsanti-finestra">
         <button class="pulsante rosso" id="crollo" aria-label="Fai crollare il sistema" title="Non premere questo pulsante"></button>
-        <button class="pulsante giallo" id="riduci-terminale" aria-label="Riduci il terminale" title="Riduci"></button>
+        <button class="pulsante giallo" id="apri-desktop" aria-label="Apri il desktop di BrainOS" title="Desktop di BrainOS"></button>
         <button class="pulsante verde" id="raggi-x" aria-label="Vista a raggi X" title="Raggi X: guarda come è costruita la pagina"></button>
       </div>
 
@@ -97,6 +97,197 @@
 
     <p class="footer-fondo">© 2026 Brian Ortega · Realizzato in HTML, CSS e JavaScript · BrainOS v1.0</p>
   </footer>
+
+  <!-- DESKTOP DI BRAINOS (pulsante giallo): resta nascosto finché non lo apri.
+       script.js lo apre, lo chiude e fa funzionare icone, menu start, orologio e batteria -->
+  <div id="desktop" class="desktop" hidden>
+
+    <!-- SFONDO: il formicaio, un disegno SVG grande 960 x 552 pixel -->
+    <div class="mondo">
+      <svg class="formicaio" viewBox="0 0 960 552" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <!-- sassolini nella terra -->
+        <g fill="#12301a">
+          <circle cx="120" cy="140" r="1.6"></circle><circle cx="260" cy="180" r="1.4"></circle><circle cx="350" cy="120" r="1.8"></circle><circle cx="600" cy="260" r="1.5"></circle><circle cx="720" cy="230" r="1.6"></circle><circle cx="880" cy="200" r="1.4"></circle><circle cx="150" cy="420" r="1.8"></circle><circle cx="420" cy="500" r="1.5"></circle><circle cx="560" cy="420" r="1.6"></circle><circle cx="700" cy="480" r="1.4"></circle><circle cx="900" cy="520" r="1.7"></circle><circle cx="80" cy="520" r="1.5"></circle><circle cx="620" cy="520" r="1.6"></circle><circle cx="780" cy="300" r="1.5"></circle><circle cx="360" cy="250" r="1.4"></circle><circle cx="470" cy="420" r="1.7"></circle>
+        </g>
+        <!-- ciuffi d'erba e linea del terreno con la collinetta del formicaio -->
+        <path d="M60 90 l-3 -10 M64 90 l1 -14 M68 90 l4 -9 M180 90 l-2 -9 M184 90 l2 -12 M300 90 l-3 -11 M304 90 l1 -8 M640 90 l-2 -12 M644 90 l3 -9 M760 90 l-3 -9 M764 90 l1 -13 M768 90 l3 -8 M900 90 l-2 -11 M904 90 l2 -9" stroke="#1c5a2a" stroke-width="1.5"></path>
+        <path d="M-1000 90 H400 Q480 34 560 90 H2000" stroke="#1c2b1f" stroke-width="2"></path>
+
+        <!-- tunnel e camere: prima il bordo (più largo), poi l'interno scuro sopra -->
+        <g stroke="#1c2b1f" stroke-width="20">
+          <path d="M480 62 C470 130 530 170 510 230 S430 310 400 350 S330 410 300 460"></path>
+          <path d="M510 230 C590 250 650 290 700 320 S790 370 830 410"></path>
+          <path d="M400 350 C360 335 300 325 262 300"></path>
+          <path d="M492 150 C540 160 590 170 640 180"></path>
+        </g>
+        <g fill="#1c2b1f">
+          <ellipse cx="262" cy="300" rx="52" ry="22"></ellipse>
+          <ellipse cx="830" cy="410" rx="72" ry="30"></ellipse>
+          <ellipse cx="300" cy="460" rx="60" ry="24"></ellipse>
+          <ellipse cx="650" cy="180" rx="44" ry="19"></ellipse>
+        </g>
+        <g stroke="#07150b" stroke-width="16">
+          <path d="M480 62 C470 130 530 170 510 230 S430 310 400 350 S330 410 300 460"></path>
+          <path d="M510 230 C590 250 650 290 700 320 S790 370 830 410"></path>
+          <path d="M400 350 C360 335 300 325 262 300"></path>
+          <path d="M492 150 C540 160 590 170 640 180"></path>
+        </g>
+        <g fill="#07150b">
+          <ellipse cx="262" cy="300" rx="50" ry="20"></ellipse>
+          <ellipse cx="830" cy="410" rx="70" ry="28"></ellipse>
+          <ellipse cx="300" cy="460" rx="58" ry="22"></ellipse>
+          <ellipse cx="650" cy="180" rx="42" ry="17"></ellipse>
+        </g>
+        <ellipse cx="480" cy="62" rx="9" ry="4" fill="#000000"></ellipse>
+
+        <!-- camera del cibo: foglie e semi -->
+        <g fill="#0f8a2c">
+          <ellipse cx="240" cy="302" rx="5" ry="2.2" transform="rotate(-25 240 302)"></ellipse>
+          <ellipse cx="254" cy="296" rx="5" ry="2.2" transform="rotate(15 254 296)"></ellipse>
+          <ellipse cx="268" cy="304" rx="5" ry="2.2" transform="rotate(-10 268 304)"></ellipse>
+          <ellipse cx="282" cy="298" rx="5" ry="2.2" transform="rotate(30 282 298)"></ellipse>
+        </g>
+        <!-- semi (camera del cibo) e uova (camera delle uova) -->
+        <g fill="#e6e6e6">
+          <circle cx="248" cy="307" r="1.8"></circle><circle cx="274" cy="293" r="1.8"></circle><circle cx="262" cy="309" r="1.8"></circle>
+          <ellipse cx="278" cy="462" rx="3.2" ry="4.4"></ellipse><ellipse cx="290" cy="457" rx="3.2" ry="4.4"></ellipse><ellipse cx="302" cy="463" rx="3.2" ry="4.4"></ellipse><ellipse cx="314" cy="458" rx="3.2" ry="4.4"></ellipse><ellipse cx="326" cy="463" rx="3.2" ry="4.4"></ellipse><ellipse cx="296" cy="470" rx="3.2" ry="4.4"></ellipse><ellipse cx="310" cy="469" rx="3.2" ry="4.4"></ellipse>
+        </g>
+        <!-- camera delle scorte: briciole -->
+        <g fill="#8a9a8c">
+          <rect x="632" y="178" width="4" height="4"></rect><rect x="640" y="183" width="3" height="3"></rect><rect x="648" y="176" width="5" height="4"></rect><rect x="658" y="182" width="4" height="3"></rect><rect x="666" y="178" width="3" height="3"></rect>
+        </g>
+        <!-- i nomi delle camere, scritti come cartelle -->
+        <g fill="#8a9a8c" font-family="JetBrains Mono, monospace" font-size="11">
+          <text x="232" y="272">\cibo</text>
+          <text x="276" y="430">\uova</text>
+          <text x="800" y="374">\regina</text>
+          <text x="628" y="156">\scorte</text>
+        </g>
+
+        <!-- la regina: una formica più grande, con la corona -->
+        <g transform="translate(838 412) scale(2.2) translate(-12 -7)">
+          <path d="M11 7 L7.5 2.8 M12.3 7 L12 2 M13.5 7 L16.5 3 M11 7 L9 11.5 M12.3 7 L13.5 12 M13.5 7 L17.5 11 M19 5.6 L22 3 M19 8.4 L22 11" stroke="#00ff41" stroke-width="0.9"></path>
+          <ellipse cx="6" cy="7" rx="4.8" ry="3.3" fill="#00ff41"></ellipse>
+          <ellipse cx="12.2" cy="7" rx="2.4" ry="1.7" fill="#00ff41"></ellipse>
+          <circle cx="17.2" cy="7" r="2.4" fill="#00ff41"></circle>
+          <path d="M4.2 4.2 V9.8 M7.2 3.8 V10.2" stroke="#000000" stroke-width="0.6"></path>
+          <path d="M15.4 4.4 L15.8 2.6 L16.7 3.6 L17.2 2.2 L17.7 3.6 L18.6 2.6 L19 4.4 Z" fill="#ffffff"></path>
+        </g>
+      </svg>
+
+      <!-- La formica "modello": script.js la copia 12 volte e ogni copia cammina nel suo tunnel -->
+      <div class="formica" id="modello-formica" hidden>
+        <svg viewBox="0 0 24 14" aria-hidden="true">
+          <!-- due posizioni delle zampe che si alternano: sembra che cammini -->
+          <path class="zampe-a" d="M11 7 L7.5 2.8 M12.3 7 L12 2 M13.5 7 L16.5 3 M11 7 L9 11.5 M12.3 7 L13.5 12 M13.5 7 L17.5 11"></path>
+          <path class="zampe-b" d="M11 7 L9 2.5 M12.3 7 L13.5 2 M13.5 7 L17.5 3 M11 7 L7.5 11.2 M12.3 7 L12 12 M13.5 7 L16.5 11"></path>
+          <path d="M19 5.6 L22 3 M19 8.4 L22 11"></path>           <!-- antenne -->
+          <ellipse cx="6" cy="7" rx="4.8" ry="3.3"></ellipse>       <!-- addome -->
+          <ellipse cx="12.2" cy="7" rx="2.4" ry="1.7"></ellipse>    <!-- torace -->
+          <circle cx="17.2" cy="7" r="2.4"></circle>                <!-- testa -->
+          <path class="strisce" d="M4.2 4.2 V9.8 M7.2 3.8 V10.2"></path>
+          <rect class="carico" x="20.5" y="5" width="3.5" height="4" rx="0.6"></rect>  <!-- briciola o foglia -->
+        </svg>
+      </div>
+    </div>
+
+    <!-- ICONE: data-app dice a script.js quale programma aprire -->
+    <div class="icone-desktop">
+      <button class="icona" data-app="cmd">
+        <span class="icona-disegno"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v14H3z M7 10l3 2.5L7 15 M12 15h5"></path></svg></span>
+        CMD
+      </button>
+      <button class="icona" data-app="terminale">
+        <span class="icona-disegno"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3z M8 20h8 M12 16v4 M6 8h5 M6 11h8"></path></svg></span>
+        Terminale
+      </button>
+      <button class="icona" data-app="phonix">
+        <span class="icona-disegno"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2.5h8a1.5 1.5 0 0 1 1.5 1.5v16a1.5 1.5 0 0 1-1.5 1.5H8A1.5 1.5 0 0 1 6.5 20V4A1.5 1.5 0 0 1 8 2.5z M11 18.5h2 M12 7.5c1.6 1.4 2.2 2.6 2.2 3.6a2.2 2.2 0 0 1-4.4 0c0-.9.5-1.6 1.1-2.2"></path></svg></span>
+        Phonix
+      </button>
+      <button class="icona" data-app="cv">
+        <span class="icona-disegno"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z M14 3v4h4 M9 12h6 M9 16h6"></path></svg></span>
+        CV
+      </button>
+      <!-- Icone bloccate: hanno il lucchetto e dicono "Accesso negato" -->
+      <button class="icona bloccata" data-app="bloccato">
+        <span class="icona-disegno">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h6l2 2h10v11H3z"></path></svg>
+          <svg class="lucchetto" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6z M9 11V8a3 3 0 0 1 6 0v3"></path></svg>
+        </span>
+        Lavori
+      </button>
+      <button class="icona bloccata" data-app="bloccato">
+        <span class="icona-disegno">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"></path></svg>
+          <svg class="lucchetto" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6z M9 11V8a3 3 0 0 1 6 0v3"></path></svg>
+        </span>
+        Extra
+      </button>
+      <button class="icona bloccata" data-app="bloccato">
+        <span class="icona-disegno">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10 M18 7h2 M4 17h4 M12 17h8 M16 5v4 M10 15v4"></path></svg>
+          <svg class="lucchetto" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6z M9 11V8a3 3 0 0 1 6 0v3"></path></svg>
+        </span>
+        Pannello
+      </button>
+      <button class="icona bloccata" data-app="bloccato">
+        <span class="icona-disegno">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16 M9 7V4h6v3 M6 7l1 13h10l1-13 M10 11v6 M14 11v6"></path></svg>
+          <svg class="lucchetto" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6z M9 11V8a3 3 0 0 1 6 0v3"></path></svg>
+        </span>
+        Cestino
+      </button>
+    </div>
+
+    <!-- FINESTRA DEI MESSAGGI (Accesso negato, Phonix): i testi li scrive script.js -->
+    <div id="finestra" class="finestra-desktop" hidden>
+      <div class="finestra-barra">
+        <span id="finestra-titolo"></span>
+        <button id="finestra-chiudi" aria-label="Chiudi">✕</button>
+      </div>
+      <div class="finestra-corpo">
+        <p id="finestra-intestazione" class="finestra-intestazione"></p>
+        <p id="finestra-testo"></p>
+        <button id="finestra-ok" class="finestra-ok">[ OK ]</button>
+      </div>
+    </div>
+
+    <p class="versione-desktop">BrainOS v1.0 · formicaio attivo</p>
+
+    <!-- MENU START: si apre con il pulsante start -->
+    <div id="menu-start" class="menu-start" hidden>
+      <p class="menu-start-titolo">BrainOS v1.0 · utente: Brian</p>
+      <button data-app="cmd">CMD</button>
+      <button data-app="terminale">Terminale</button>
+      <button data-app="phonix">Phonix</button>
+      <button data-app="cv">CV</button>
+      <button data-app="spegni" class="menu-start-spegni">Arresta il sistema</button>
+    </div>
+
+    <!-- BARRA DELLE APPLICAZIONI: start a sinistra, Wi-Fi, batteria e orologio a destra -->
+    <div class="barra-applicazioni">
+      <div class="barra-sinistra">
+        <button id="start" class="start" aria-expanded="false" aria-controls="menu-start">
+          <img src="img/icona.svg" alt="">
+          start
+        </button>
+        <span id="app-aperta" class="app-aperta" hidden></span>
+      </div>
+
+      <div class="barra-destra">
+        <svg id="wifi" viewBox="0 0 24 24" role="img" aria-label="Connesso a Internet"><path d="M2.5 9a14 14 0 0 1 19 0 M5.5 12.5a9.5 9.5 0 0 1 13 0 M8.8 15.8a5 5 0 0 1 6.4 0 M12 19.5h.01"></path></svg>
+        <span class="batteria-desktop">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 7.5h17v9h-17z M21.5 10.5v3"></path><rect id="batteria-carica" x="4.5" y="9.5" width="13" height="5"></rect></svg>
+          <span id="batteria-testo"></span>
+        </span>
+        <div class="orologio">
+          <span id="ora">--:--</span>
+          <span id="data"></span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

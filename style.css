@@ -177,7 +177,7 @@ h2::before {
   text-shadow: var(--bagliore);
 }
 
-/* I tre pulsanti della finestra: rosso chiudi, giallo riduci, verde ingrandisci */
+/* I tre pulsanti della finestra: rosso = crollo, giallo = desktop di BrainOS, verde = raggi X */
 .pulsanti-finestra {
   position: absolute;
   top: 16px;
@@ -200,7 +200,7 @@ h2::before {
 .pulsante.giallo { background: #ffbd2e; }
 .pulsante.verde  { background: #27c93f; }
 
-/* Passando sopra ai pulsanti compaiono i simboli × − +, come su Mac */
+/* Passando sopra ai pulsanti compaiono i simboli × − x, come su Mac */
 .pulsante::before {
   position: absolute;
   inset: 0;
@@ -214,21 +214,11 @@ h2::before {
 }
 
 .pulsante.rosso::before  { content: "×"; }
-.pulsante.giallo::before { content: "−"; }
+.pulsante.giallo::before { content: "−"; }   /* − = riduci il sito e guarda il desktop */
 .pulsante.verde::before  { content: "x"; }   /* x come raggi X */
 
 .pulsanti-finestra:hover .pulsante::before {
   opacity: 1;
-}
-
-/* Terminale RIDOTTO (giallo): resta solo la barra con i pulsanti */
-.terminale.ridotto {
-  height: 48px;
-  padding: 0;
-}
-
-.terminale.ridotto .contenuto-terminale {
-  display: none;
 }
 
 #righe-avvio p {
@@ -1152,6 +1142,475 @@ h2::before {
 .schermata-riavvio::after {
   content: "_";
   animation: lampeggia 1s steps(1) infinite;
+}
+
+/* 18d. PULSANTE GIALLO: IL DESKTOP DI BRAINOS */
+
+/* Mentre il desktop è aperto, la pagina sotto non scorre */
+.desktop-aperto {
+  overflow: hidden;
+}
+
+/* Il desktop copre tutto lo schermo.
+   z-index 90: sopra la pagina, ma sotto al CMD (100), che deve potersi aprire sopra */
+.desktop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  overflow: hidden;
+  background: var(--sfondo);
+  color: var(--testo);
+  font-family: var(--mono);
+  animation: appari 0.3s ease;
+}
+
+.desktop[hidden] {
+  display: none;
+}
+
+/* IL FORMICAIO: un riquadro di 960 x 552 pixel al centro dello schermo.
+   Le formiche camminano su percorsi misurati in pixel dentro questo riquadro */
+.mondo {
+  position: absolute;
+  top: max(0px, calc(50% - 300px));
+  left: 50%;
+  width: 960px;
+  height: 552px;
+  margin-left: -480px;           /* metà della larghezza: così è centrato */
+}
+
+.formicaio {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;             /* la linea del terreno continua fuori dal riquadro */
+}
+
+/* Una formica: 24 x 14 pixel, segue il suo percorso (offset-path)
+   e si gira da sola nella direzione in cui cammina (offset-rotate: auto) */
+.formica {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 14px;
+  offset-anchor: center;
+  offset-rotate: auto;
+  filter: drop-shadow(0 0 3px rgba(0, 255, 65, 0.7));
+  animation: cammina linear infinite;
+}
+
+.formica svg {
+  display: block;
+  width: 24px;
+  height: 14px;
+}
+
+.formica ellipse,
+.formica circle {
+  fill: var(--verde);
+}
+
+.formica path {
+  fill: none;
+  stroke: var(--verde);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+}
+
+/* le righe nere sull'addome */
+.formica .strisce {
+  stroke: var(--sfondo);
+  stroke-width: 0.8;
+}
+
+/* Le due posizioni delle zampe si accendono a turno: sembra che cammini */
+.zampe-a {
+  animation: passo 0.3s steps(1) infinite;
+}
+
+.zampe-b {
+  animation: passo 0.3s steps(1) infinite -0.15s;
+}
+
+/* Quello che trasporta: di solito niente, a volte una briciola o una foglia */
+.formica .carico {
+  display: none;
+}
+
+.porta-briciola .carico {
+  display: inline;
+  fill: var(--testo);
+}
+
+.porta-foglia .carico {
+  display: inline;
+  fill: #0f8a2c;
+}
+
+/* Al contrario: cammina dalla fine all'inizio del percorso, girata dall'altra parte */
+.indietro {
+  offset-rotate: reverse;
+  animation-direction: reverse;
+}
+
+/* I 5 percorsi (gli stessi tunnel disegnati nell'SVG) e quanto ci mettono */
+.r1 { offset-path: path("M1400 84 H560 Q522 52 480 58 C470 130 530 170 510 230 S430 310 400 350 S330 410 300 456"); animation-duration: 18s; }
+.r2 { offset-path: path("M510 230 C590 250 650 290 700 320 S780 370 800 392"); animation-duration: 7s; }
+.r3 { offset-path: path("M400 350 C360 335 300 325 270 304"); animation-duration: 5s; }
+.r4 { offset-path: path("M492 150 C540 160 590 170 630 178"); animation-duration: 4s; }
+.r5 { offset-path: path("M-440 84 H400 Q438 52 480 58"); animation-duration: 14s; }
+
+/* La formica compare all'inizio del percorso e sparisce alla fine */
+@keyframes cammina {
+  0%   { offset-distance: 0%; opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+@keyframes passo {
+  50% { opacity: 0; }
+}
+
+/* LE ICONE: due colonne in alto a sinistra */
+.icone-desktop {
+  position: absolute;
+  top: 20px;
+  left: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 84px);
+  gap: 10px;
+}
+
+.icona {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--bianco);
+  font: 400 12px var(--mono);
+  cursor: pointer;
+}
+
+/* Passando sopra (o con il tasto Tab) l'icona viene "selezionata" */
+.icona:hover,
+.icona:focus-visible {
+  background: var(--verde-tenue);
+  border: 1px dashed var(--verde);
+  outline: none;
+}
+
+.icona-disegno {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--verde);
+  box-shadow: var(--bagliore);
+  color: var(--verde);
+}
+
+.icona svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Icone bloccate: grigie, con il lucchetto verde nell'angolo */
+.icona.bloccata {
+  color: var(--grigio);
+}
+
+.icona.bloccata .icona-disegno {
+  border-color: var(--bordo);
+  box-shadow: none;
+  color: var(--grigio);
+}
+
+.icona .lucchetto {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 14px;
+  height: 14px;
+  fill: var(--sfondo);
+  stroke: var(--verde);
+  stroke-width: 2;
+}
+
+/* LA FINESTRA DEI MESSAGGI (Accesso negato, Phonix), in alto a destra */
+.finestra-desktop {
+  position: absolute;
+  top: 112px;
+  right: 16px;
+  z-index: 2;
+  width: 300px;
+  background: var(--sfondo);
+  border: 1px solid var(--verde);
+  box-shadow: 0 0 24px rgba(0, 255, 65, 0.25);
+  animation: appari 0.2s ease;
+}
+
+.finestra-desktop[hidden] {
+  display: none;
+}
+
+.finestra-barra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 6px 6px 12px;
+  background: var(--fascia);
+  border-bottom: 1px solid var(--bordo);
+  font-size: 12px;
+}
+
+.finestra-barra button {
+  padding: 2px 8px;
+  background: none;
+  border: none;
+  color: var(--testo);
+  font: inherit;
+  cursor: pointer;
+}
+
+/* La X diventa rossa, come nel CMD */
+.finestra-barra button:hover {
+  background: #e81123;
+  color: var(--bianco);
+}
+
+.finestra-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 18px 16px;
+}
+
+.finestra-corpo p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.finestra-corpo .finestra-intestazione {
+  color: var(--verde);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-shadow: var(--bagliore);
+}
+
+.finestra-ok {
+  align-self: flex-end;
+  padding: 6px 16px;
+  background: transparent;
+  border: 1px solid var(--verde);
+  color: var(--verde);
+  font: 700 13px var(--mono);
+  cursor: pointer;
+}
+
+.finestra-ok:hover {
+  background: var(--verde);
+  color: var(--sfondo);
+}
+
+.versione-desktop {
+  position: absolute;
+  right: 16px;
+  bottom: 60px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--grigio);
+}
+
+/* IL MENU START: sopra il pulsante start */
+.menu-start {
+  position: absolute;
+  left: 12px;
+  bottom: 56px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  padding: 8px;
+  background: var(--sfondo);
+  border: 1px solid var(--verde);
+  box-shadow: 0 0 24px rgba(0, 255, 65, 0.25);
+  animation: appari 0.2s ease;
+}
+
+.menu-start[hidden] {
+  display: none;
+}
+
+.menu-start-titolo {
+  margin: 0 0 6px;
+  padding: 4px 8px 8px;
+  border-bottom: 1px solid var(--bordo);
+  color: var(--grigio);
+  font-size: 12px;
+}
+
+.menu-start button {
+  padding: 8px;
+  background: none;
+  border: none;
+  color: var(--testo);
+  font: 13px var(--mono);
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-start button::before {
+  content: "> ";
+  color: var(--verde);
+}
+
+.menu-start button:hover {
+  background: var(--verde-tenue);
+  color: var(--verde);
+}
+
+.menu-start .menu-start-spegni {
+  margin-top: 6px;
+  border-top: 1px solid var(--bordo);
+}
+
+/* LA BARRA DELLE APPLICAZIONI in basso, con il bordo verde luminoso */
+.barra-applicazioni {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+  background: var(--sfondo);
+  border-top: 1px solid var(--verde);
+  box-shadow: 0 -2px 14px rgba(0, 255, 65, 0.25);
+}
+
+.barra-sinistra {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.start {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px 0 6px;
+  background: transparent;
+  border: 1px solid var(--bordo);
+  color: var(--verde);
+  font: 700 13px var(--mono);
+  text-shadow: var(--bagliore);
+  cursor: pointer;
+}
+
+/* acceso quando ci passi sopra o quando il menu è aperto */
+.start:hover,
+.start[aria-expanded="true"] {
+  border-color: var(--verde);
+  background: var(--verde-tenue);
+}
+
+.start img {
+  width: 26px;
+  height: 26px;
+}
+
+/* il nome del "programma" aperto, come nella barra di Windows */
+.app-aperta {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  border-bottom: 2px solid var(--verde);
+  background: var(--verde-tenue);
+  font-size: 12px;
+}
+
+.app-aperta[hidden] {
+  display: none;
+}
+
+.barra-destra {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--verde);
+}
+
+.barra-destra svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* senza Internet l'icona del Wi-Fi diventa grigia */
+#wifi.offline {
+  color: var(--grigio);
+}
+
+.batteria-desktop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+#batteria-carica {
+  fill: currentColor;
+  stroke: none;
+}
+
+.orologio {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-left: 14px;
+  border-left: 1px solid var(--bordo);
+  line-height: 1.25;
+}
+
+#ora {
+  color: var(--bianco);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+#data {
+  color: var(--grigio);
+  font-size: 11px;
+}
+
+/* Per chi ha chiesto al computer di ridurre le animazioni: niente formiche in movimento */
+@media (prefers-reduced-motion: reduce) {
+  .formica {
+    display: none;
+  }
 }
 
 /* 19. TELEFONO (schermi stretti) */

@@ -196,17 +196,13 @@ function creaCompetenze(lista) {
 }
 
 // I tre pulsanti della finestra del terminale:
-// rosso = il sistema crolla (sezione 8), giallo = riduci, verde = vista a raggi X (sezione 7)
+// rosso = il sistema crolla (sezione 8), giallo = desktop di BrainOS (sezione 9), verde = raggi X (sezione 7)
 function preparaFinestraTerminale() {
-  const terminale = document.getElementById("terminale");
-
   // ROSSO: fa crollare tutto il sito
   document.getElementById("crollo").addEventListener("click", crollaSistema);
 
-  // GIALLO: riduce il terminale alla sola barra in alto (premuto di nuovo, lo riapre)
-  document.getElementById("riduci-terminale").addEventListener("click", function () {
-    terminale.classList.toggle("ridotto");
-  });
+  // GIALLO: apre il desktop di BrainOS
+  document.getElementById("apri-desktop").addEventListener("click", apriDesktop);
 
   // VERDE: accende e spegne la vista a raggi X
   document.getElementById("raggi-x").addEventListener("click", cambiaRaggiX);
@@ -445,9 +441,13 @@ function preparaEasterEgg() {
       pioggiaMatrix();
     }
 
-    // Esc: chiude il CMD
-    if (evento.key === "Escape" && cmd && !cmd.hidden) {
-      chiudiCmd();
+    // Esc: chiude il CMD; se il CMD è già chiuso, chiude il desktop di BrainOS (sezione 9)
+    if (evento.key === "Escape") {
+      if (cmd && !cmd.hidden) {
+        chiudiCmd();
+      } else if (desktopAperto) {
+        chiudiDesktop();
+      }
     }
   });
 }
@@ -798,6 +798,7 @@ async function crollaSistema() {
   // tolgo le altre cose eventualmente aperte
   if (raggiAttivi) disattivaRaggiX();
   if (cmd) chiudiCmd();
+  if (desktopAperto) chiudiDesktop();
 
   // Per chi ha chiesto al computer di ridurre le animazioni: subito la schermata d'errore
   const pocoMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -935,13 +936,189 @@ async function schermataErrore() {
 }
 
 
-// 9. PARTENZA: preparo menu ed easter egg (ci sono in tutte le pagine),
-//    poi capisco in che pagina sono e avvio quella giusta
+// 9. PULSANTE GIALLO: IL DESKTOP DI BRAINOS
+//    Il terminale si "riduce" e compare il desktop del sistema operativo del sito.
+//    Il desktop è già scritto in index.html (div #desktop, nascosto):
+//    qui lo apro, lo chiudo e faccio funzionare formiche, icone, menu start, orologio e batteria.
+
+let desktopAperto = false;
+let orologio = null;   // il timer che aggiorna l'ora ogni secondo
+
+// Le formiche del formicaio:
+// percorso = il tunnel in cui cammina (r1...r5, scritti in style.css)
+// ritardo  = da quanti secondi è già in cammino (così non partono tutte insieme)
+// indietro = cammina al contrario
+// porta    = cosa trasporta (briciola o foglia)
+const FORMICHE = [
+  { percorso: "r1", ritardo: 0 },
+  { percorso: "r1", ritardo: 6 },
+  { percorso: "r1", ritardo: 12, porta: "briciola" },
+  { percorso: "r1", ritardo: 9, indietro: true },
+  { percorso: "r2", ritardo: 0, porta: "briciola" },
+  { percorso: "r2", ritardo: 3.5, porta: "foglia" },
+  { percorso: "r3", ritardo: 0 },
+  { percorso: "r3", ritardo: 2.5, indietro: true, porta: "foglia" },
+  { percorso: "r4", ritardo: 0 },
+  { percorso: "r4", ritardo: 2, indietro: true, porta: "briciola" },
+  { percorso: "r5", ritardo: 3, porta: "foglia" },
+  { percorso: "r5", ritardo: 9, indietro: true }
+];
+
+// Prepara il desktop una volta sola, quando si apre la Home
+function preparaDesktop() {
+  creaFormiche();
+
+  // Ogni icona (e ogni voce del menu start) ha scritto in data-app il programma da aprire
+  document.querySelectorAll("#desktop [data-app]").forEach(function (pulsante) {
+    pulsante.addEventListener("click", function () {
+      apriApp(pulsante.dataset.app);
+    });
+  });
+
+  // Start: apre e chiude il menu
+  document.getElementById("start").addEventListener("click", cambiaMenuStart);
+
+  // OK e ✕ chiudono la finestra dei messaggi
+  document.getElementById("finestra-ok").addEventListener("click", chiudiFinestra);
+  document.getElementById("finestra-chiudi").addEventListener("click", chiudiFinestra);
+
+  // Clic in un punto vuoto del desktop: il menu start si chiude
+  document.getElementById("desktop").addEventListener("click", function (evento) {
+    if (!evento.target.closest("#menu-start, #start")) chiudiMenuStart();
+  });
+}
+
+// Crea le formiche copiando la formica "modello" che si trova in index.html
+function creaFormiche() {
+  const modello = document.getElementById("modello-formica");
+  FORMICHE.forEach(function (dati) {
+    const formica = modello.cloneNode(true);    // una copia del disegno
+    formica.removeAttribute("id");              // l'id deve essere unico: alle copie lo tolgo
+    formica.hidden = false;
+    formica.classList.add(dati.percorso);
+    if (dati.indietro) formica.classList.add("indietro");
+    if (dati.porta) formica.classList.add("porta-" + dati.porta);
+    formica.style.animationDelay = -dati.ritardo + "s";   // ritardo negativo = è già in cammino
+    modello.parentElement.appendChild(formica);
+  });
+}
+
+function apriDesktop() {
+  // Da telefono il desktop non ci sta: scrivo un avviso nel terminale e mi fermo
+  if (window.innerWidth < 700) {
+    avvisoSoloPC();
+    return;
+  }
+  if (raggiAttivi) disattivaRaggiX();
+
+  document.getElementById("desktop").hidden = false;
+  document.documentElement.classList.add("desktop-aperto");   // la pagina sotto non scorre
+  desktopAperto = true;
+
+  aggiornaOra();
+  orologio = setInterval(aggiornaOra, 1000);   // l'ora si aggiorna ogni secondo
+  leggiBatteria();
+  leggiConnessione();
+}
+
+function chiudiDesktop() {
+  document.getElementById("desktop").hidden = true;
+  document.documentElement.classList.remove("desktop-aperto");
+  desktopAperto = false;
+  clearInterval(orologio);
+  chiudiMenuStart();
+  chiudiFinestra();
+}
+
+// Avviso per il telefono: una riga in più nel terminale (una volta sola)
+function avvisoSoloPC() {
+  if (document.getElementById("solo-pc")) return;
+  const riga = document.createElement("p");
+  riga.id = "solo-pc";
+  riga.textContent = "> Il desktop di BrainOS si apre solo da PC";
+  document.getElementById("righe-avvio").appendChild(riga);
+}
+
+// Orologio vero: ora e data del computer di chi guarda il sito
+function aggiornaOra() {
+  const adesso = new Date();
+  document.getElementById("ora").textContent = adesso.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+  document.getElementById("data").textContent = adesso.toLocaleDateString("it-IT");
+}
+
+// Batteria vera (funziona in Chrome ed Edge; negli altri browser resta il disegno pieno)
+function leggiBatteria() {
+  if (!navigator.getBattery) return;
+  navigator.getBattery().then(function (batteria) {
+    const livello = Math.round(batteria.level * 100);
+    document.getElementById("batteria-testo").textContent = livello + "%";
+    document.getElementById("batteria-carica").setAttribute("width", 13 * batteria.level);   // 13 = batteria piena
+  });
+}
+
+// Wi-Fi vero: se il dispositivo non è connesso, l'icona diventa grigia
+function leggiConnessione() {
+  const wifi = document.getElementById("wifi");
+  wifi.classList.toggle("offline", !navigator.onLine);
+  wifi.setAttribute("aria-label", navigator.onLine ? "Connesso a Internet" : "Nessuna connessione");
+}
+
+// Apre il "programma" scritto in data-app
+function apriApp(nome) {
+  chiudiMenuStart();
+  if (nome === "cmd") {
+    apriCmd();                       // il CMD della sezione 6, che si apre sopra al desktop
+  } else if (nome === "terminale" || nome === "spegni") {
+    chiudiDesktop();                 // si torna al terminale della Home
+    window.scrollTo(0, 0);
+  } else if (nome === "cv") {
+    window.location.href = "cv.html";
+  } else if (nome === "phonix") {
+    mostraFinestra("phonix.exe", "> PHONIX", "La mia attività di riparazioni. Phone + Fenix: come la fenice, ogni dispositivo rinasce.");
+  } else {
+    // tutte le altre icone sono bloccate
+    mostraFinestra("sicurezza.exe", "> ACCESSO NEGATO", "Serve il permesso dell'amministratore (Brian).");
+  }
+}
+
+// La finestra dei messaggi in alto a destra (e il suo nome nella barra delle applicazioni)
+function mostraFinestra(programma, intestazione, testo) {
+  document.getElementById("finestra-titolo").textContent = "C:\\BrainOS\\" + programma;
+  document.getElementById("finestra-intestazione").textContent = intestazione;
+  document.getElementById("finestra-testo").textContent = testo;
+  document.getElementById("finestra").hidden = false;
+
+  const appAperta = document.getElementById("app-aperta");
+  appAperta.textContent = programma;
+  appAperta.hidden = false;
+}
+
+function chiudiFinestra() {
+  document.getElementById("finestra").hidden = true;
+  document.getElementById("app-aperta").hidden = true;
+}
+
+// Il pulsante start apre il menu se è chiuso, e lo chiude se è aperto
+function cambiaMenuStart() {
+  const menu = document.getElementById("menu-start");
+  menu.hidden = !menu.hidden;
+  document.getElementById("start").setAttribute("aria-expanded", !menu.hidden);
+}
+
+function chiudiMenuStart() {
+  document.getElementById("menu-start").hidden = true;
+  document.getElementById("start").setAttribute("aria-expanded", "false");
+}
+
+
+// 10. PARTENZA: preparo menu ed easter egg (ci sono in tutte le pagine),
+//     poi capisco in che pagina sono e avvio quella giusta
 preparaMenu();
 preparaEasterEgg();
 
 if (document.body.classList.contains("pagina-home")) {
   preparaFinestraTerminale();
+  preparaDesktop();
   avviaHome();
 } else if (document.body.classList.contains("pagina-cv")) {
   avviaCV();
