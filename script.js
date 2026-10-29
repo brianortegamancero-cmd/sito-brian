@@ -6,7 +6,8 @@
 const FOGLI = {
   home: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-vhK4GHrokgWfCDUCur7msY8FUub8z6Ar7wVxegtIbOhAO5NlbvMs47VI_tp-33TJm8uP1BLz5P9U/pub?gid=0&single=true&output=csv",
   cv: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-vhK4GHrokgWfCDUCur7msY8FUub8z6Ar7wVxegtIbOhAO5NlbvMs47VI_tp-33TJm8uP1BLz5P9U/pub?gid=495881978&single=true&output=csv",
-  stage: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-vhK4GHrokgWfCDUCur7msY8FUub8z6Ar7wVxegtIbOhAO5NlbvMs47VI_tp-33TJm8uP1BLz5P9U/pub?gid=1518556426&single=true&output=csv"
+  stage: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-vhK4GHrokgWfCDUCur7msY8FUub8z6Ar7wVxegtIbOhAO5NlbvMs47VI_tp-33TJm8uP1BLz5P9U/pub?gid=1518556426&single=true&output=csv",
+  extra: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-vhK4GHrokgWfCDUCur7msY8FUub8z6Ar7wVxegtIbOhAO5NlbvMs47VI_tp-33TJm8uP1BLz5P9U/pub?gid=607733622&single=true&output=csv"
 };
 
 
@@ -396,6 +397,85 @@ async function avviaStage() {
 }
 
 
+// 5b. PAGINA EXTRA (i miei lavori)
+
+// Crea una card per ogni lavoro: immagine, categoria, titolo, descrizione e (se c'è) il pulsante "Apri".
+// Se una cella del foglio è vuota, quella parte non la mostro
+function creaSchede(lista) {
+  const box = document.getElementById("schede");
+  lista.forEach(function (lavoro) {
+    const card = document.createElement("article");
+    card.className = "card card-extra";
+
+    if (lavoro.immagine) {
+      const img = document.createElement("img");
+      img.src = "img/" + lavoro.immagine;
+      img.alt = lavoro.titolo;
+      // se il file non c'è (ad esempio non l'ho ancora caricato) tolgo l'immagine: niente icona rotta
+      img.addEventListener("error", function () {
+        img.remove();
+      });
+      card.appendChild(img);
+    }
+
+    const corpo = document.createElement("div");
+    corpo.className = "card-corpo";
+
+    if (lavoro.categoria) {
+      const categoria = document.createElement("span");
+      categoria.className = "categoria";
+      categoria.textContent = lavoro.categoria;
+      corpo.appendChild(categoria);
+    }
+
+    const titolo = document.createElement("h3");
+    titolo.textContent = lavoro.titolo;
+    corpo.appendChild(titolo);
+
+    if (lavoro.descrizione) {
+      const descrizione = document.createElement("p");
+      descrizione.textContent = lavoro.descrizione;
+      corpo.appendChild(descrizione);
+    }
+
+    // Il pulsante c'è solo se il link è un indirizzo web vero (comincia con https:// o http://)
+    const link = lavoro.link || "";
+    if (link.startsWith("https://") || link.startsWith("http://")) {
+      const pulsante = document.createElement("a");
+      pulsante.className = "pulsante-apri";
+      pulsante.href = link;
+      pulsante.target = "_blank";              // si apre in una nuova scheda
+      pulsante.rel = "noopener noreferrer";    // sicurezza: la nuova scheda non può controllare il mio sito
+      pulsante.textContent = "Apri";
+      corpo.appendChild(pulsante);
+    }
+
+    card.appendChild(corpo);
+    box.appendChild(card);
+  });
+}
+
+// Avvia tutta la pagina Extra
+async function avviaExtra() {
+  try {
+    const righe = await caricaFoglio(FOGLI.extra);
+    nascondiCaricamento();
+
+    // dalla riga "pagina": il titolo grande e l'introduzione
+    const pagina = prendiSezione(righe, "pagina")[0];
+    if (pagina) {
+      document.getElementById("titolo-extra").textContent = pagina.titolo;
+      document.getElementById("intro-extra").textContent = pagina.descrizione;
+    }
+
+    creaSchede(prendiSezione(righe, "scheda"));
+  } catch (errore) {
+    console.error(errore);
+    mostraErrore();
+  }
+}
+
+
 // 6. EASTER EGG
 //    CMD segreto: Ctrl + Alt + R (R di "Run", come Win+R) oppure 4 clic sul logo (da telefono)
 //    Pioggia Matrix: Ctrl + Alt + M, oppure il comando "matrix" nel CMD
@@ -550,7 +630,7 @@ function scriviCmd(testo, classe) {
 // Legge il comando scritto e risponde
 function eseguiComando(testo) {
   const comando = testo.trim().toLowerCase();
-  const pagine = { home: "index.html", cv: "cv.html", stage: "stage.html" };
+  const pagine = { home: "index.html", cv: "cv.html", stage: "stage.html", extra: "extra.html" };
 
   scriviCmd("C:\\Brian>" + testo);   // ripeto il comando, come fa il vero CMD
   if (comando === "") return;
@@ -558,7 +638,7 @@ function eseguiComando(testo) {
   if (comando === "help") {
     scriviCmd(
       "Comandi disponibili:\n" +
-      "  home, cv, stage   apre la pagina\n" +
+      "  home, cv, stage, extra   apre la pagina\n" +
       "  diagnostica       controllo completo del sistema\n" +
       "  systeminfo        informazioni sul tuo dispositivo\n" +
       "  ping              test di connessione al foglio Google\n" +
@@ -1050,6 +1130,8 @@ function apriApp(nome) {
     apriFinestraColonia();
   } else if (nome === "cv") {
     window.location.href = "cv.html";
+  } else if (nome === "extra") {
+    window.location.href = "extra.html";
   } else if (nome === "phonix") {
     mostraFinestra("phonix.exe", "> PHONIX", "La mia attività di riparazioni. Phone + Fenix: come la fenice, ogni dispositivo rinasce.");
   } else {
@@ -2398,4 +2480,6 @@ if (document.body.classList.contains("pagina-home")) {
   avviaCV();
 } else if (document.body.classList.contains("pagina-stage")) {
   avviaStage();
+} else if (document.body.classList.contains("pagina-extra")) {
+  avviaExtra();
 }

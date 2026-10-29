@@ -751,6 +751,73 @@ h2::before {
   margin: 0;
 }
 
+/* 15b. PAGINA EXTRA (i miei lavori): card come quelle delle passioni nella Home */
+
+/* finché il titolo non arriva dal foglio, lo spazio c'è già */
+#titolo-extra {
+  min-height: 1.2em;
+}
+
+.intro-extra {
+  max-width: 640px;
+  min-height: 1.6em;
+  margin: 8px 0 32px;
+  color: var(--grigio);
+}
+
+/* la card è una colonna: immagine sopra, testi sotto, pulsante sempre in fondo */
+.card-extra {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-corpo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px 20px;
+}
+
+.card-extra h3,
+.card-extra p {
+  margin: 0;
+}
+
+/* la categoria: piccola etichetta verde */
+.categoria {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--verde-tenue);
+  color: var(--verde);
+  font: 700 0.75rem var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* il pulsante "Apri": bordo verde, si riempie passandoci sopra */
+.pulsante-apri {
+  align-self: flex-start;
+  margin-top: auto;              /* lo spinge in fondo alla card */
+  padding: 8px 18px;
+  border: 1px solid var(--verde);
+  border-radius: 8px;
+  color: var(--verde);
+  font: 700 0.85rem var(--mono);
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.pulsante-apri::after {
+  content: " ↗";
+}
+
+.pulsante-apri:hover {
+  background: var(--verde);
+  color: var(--sfondo);
+}
+
 /* 16. ANIMAZIONI */
 @keyframes appari {
   from { opacity: 0; transform: translateY(4px); }
