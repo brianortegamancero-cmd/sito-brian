@@ -1187,19 +1187,32 @@ h2::before {
   overflow: visible;             /* la linea del terreno continua fuori dal riquadro */
 }
 
-/* Una formica: 24 x 14 pixel, segue il suo percorso (offset-path)
-   e si gira da sola nella direzione in cui cammina (offset-rotate: auto) */
-.formica {
+/* LE CREATURE (formiche e ragno): script.js le sposta a ogni fotogramma cambiando il transform */
+.creatura {
   position: absolute;
   top: 0;
   left: 0;
+  transform-origin: center;
+  pointer-events: none;          /* non bloccano i clic */
+  transition: opacity 0.5s;      /* compaiono e spariscono piano */
+}
+
+/* quando nasce (all'inizio) e quando muore è trasparente */
+.creatura.muore {
+  opacity: 0;
+}
+
+/* lampo bianco quando viene colpita in un combattimento */
+.creatura.lampo,
+.ferita {
+  filter: drop-shadow(0 0 6px #ffffff) brightness(1.8);
+}
+
+/* Una formica: 24 x 14 pixel */
+.formica {
   width: 24px;
   height: 14px;
-  offset-anchor: center;
-  offset-rotate: auto;
   filter: drop-shadow(0 0 3px rgba(0, 255, 65, 0.7));
-  animation: cammina linear infinite;
-  pointer-events: none;          /* le formiche non bloccano i clic sui pericoli */
 }
 
 .formica svg {
@@ -1250,13 +1263,12 @@ h2::before {
   fill: #0f8a2c;
 }
 
-/* Al contrario: cammina dalla fine all'inizio del percorso, girata dall'altra parte */
-.indietro {
-  offset-rotate: reverse;
-  animation-direction: reverse;
+/* le nutrici portano le uova: bianche e arrotondate */
+.porta-uovo .carico {
+  display: inline;
+  fill: var(--bianco);
+  rx: 1.8px;
 }
-
-/* Il percorso (offset-path) e la durata di ogni formica li sceglie script.js */
 
 /* Le soldate sono più grandi */
 .soldata {
@@ -1264,10 +1276,8 @@ h2::before {
   height: 20px;
 }
 
-/* Le nemiche sono bianche e camminano in superficie verso il buco */
+/* Le nemiche sono bianche */
 .nemica {
-  offset-path: path("M1100 84 H560 Q530 62 506 58");
-  animation-duration: 5s;
   filter: none;
 }
 
@@ -1278,14 +1288,6 @@ h2::before {
 
 .nemica path {
   stroke: var(--testo);
-}
-
-/* La formica compare all'inizio del percorso e sparisce alla fine */
-@keyframes cammina {
-  0%   { offset-distance: 0%; opacity: 0; }
-  5%   { opacity: 1; }
-  95%  { opacity: 1; }
-  100% { offset-distance: 100%; opacity: 0; }
 }
 
 @keyframes passo {
@@ -1688,7 +1690,7 @@ h2::before {
 .colonia-numeri {
   display: grid;
   grid-template-columns: 76px 1fr;
-  gap: 6px 12px;
+  gap: 4px 12px;
   align-items: center;
   margin: 0;
   font-size: 13px;
@@ -1740,8 +1742,11 @@ h2::before {
 }
 
 .finestra-corpo .colonia-diario p {
+  overflow: hidden;              /* una riga sola: se è troppo lunga finisce con … */
   color: var(--grigio);
   font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .finestra-corpo .colonia-diario p:last-child {
@@ -1749,7 +1754,7 @@ h2::before {
   font-weight: 700;
 }
 
-/* I PERICOLI: uno strato grande come il formicaio; si possono cliccare solo i pulsanti */
+/* LA PIOGGIA: uno strato grande come il formicaio, con gocce e acqua (non blocca i clic) */
 .pericolo {
   position: absolute;
   inset: 0;
@@ -1760,30 +1765,53 @@ h2::before {
   display: none;
 }
 
-.colpisci {
+/* gocce e rivolo si vedono solo mentre piove; l'acqua resta finché le operaie non la tolgono */
+.pericolo:not(.piove) .goccia,
+.pericolo:not(.piove) .rivolo {
+  display: none;
+}
+
+.pioggia-disegno {
   position: absolute;
-  padding: 0;
-  background: transparent;
-  border: none;
-  pointer-events: auto;
-  cursor: crosshair;             /* il mirino */
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-/* piccolo lampo verde quando colpisci */
-.colpisci.colpito {
-  background: rgba(0, 255, 65, 0.35);
+.goccia {
+  stroke: var(--testo);
+  stroke-width: 1.5;
+  animation: cade 0.9s linear infinite;
 }
 
-/* Il ragno: bianco con gli occhi verdi, si muove su e giù */
+/* l'acqua nel tunnel: script.js cambia l'opacità in base a quanta ce n'è */
+.acqua {
+  fill: none;
+  stroke: rgba(230, 230, 230, 0.35);
+  stroke-width: 14;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.rivolo {
+  fill: none;
+  stroke: var(--testo);
+  stroke-width: 3;
+  stroke-dasharray: 3 9;
+  stroke-linecap: round;
+  animation: scorre 0.8s linear infinite;
+}
+
+/* IL RAGNO: bianco con gli occhi verdi, si muove su e giù mentre cammina */
 .ragno {
-  left: 470px;
-  top: 128px;
   width: 60px;
   height: 64px;
-  border-radius: 50%;
 }
 
 .ragno svg {
+  display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
@@ -1806,94 +1834,154 @@ h2::before {
   fill: var(--verde);
 }
 
-/* La pioggia: gocce che cadono e acqua nel tunnel principale */
-.pioggia-disegno {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
+/* 18f. COLONIA: CLIC, MORTE, ALATE, NOTTE, INVERNO E SCHEDA */
 
-.goccia {
-  stroke: var(--testo);
-  stroke-width: 1.5;
-  animation: cade 0.9s linear infinite;
-}
-
-.acqua {
-  fill: none;
-  stroke: rgba(230, 230, 230, 0.3);
-  stroke-width: 14;
-  stroke-linecap: round;
-}
-
-.rivolo {
-  fill: none;
-  stroke: var(--testo);
-  stroke-width: 3;
-  stroke-dasharray: 3 9;
-  stroke-linecap: round;
-  animation: scorre 0.8s linear infinite;
-}
-
-.acqua-bottone {
-  left: 462px;
-  top: 56px;
-  width: 72px;
-  height: 180px;
-  border: 1px dashed var(--verde);
-  border-radius: 30px;
-}
-
-/* Le nemiche: la zona da cliccare è la superficie vicino al buco */
-.nemiche-bottone {
-  left: 496px;
-  top: 30px;
-  width: 300px;
-  height: 66px;
-  border: 1px dashed var(--verde);
-}
-
-/* La scritta che dice cosa cliccare, con la vita che resta al pericolo */
-.aiuto {
-  position: absolute;
-  padding: 4px 10px;
-  background: var(--sfondo);
-  border: 1px dashed var(--verde);
-  color: var(--verde);
-  font: 700 11px var(--mono);
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-}
-
-.vita {
-  margin-left: 6px;
-  letter-spacing: 2px;
-}
-
-#pericolo-ragno .aiuto   { left: 540px; top: 146px; }
-#pericolo-pioggia .aiuto { left: 546px; top: 110px; }
-#pericolo-nemiche .aiuto { left: 560px; top: 102px; }
-
-/* FAME: la zona in superficie dove si lasciano le briciole */
-.zona-briciole {
-  position: absolute;
-  left: 40px;
-  top: 16px;
-  width: 380px;
-  height: 64px;
-  background: var(--verde-tenue);
-  border: 1px dashed var(--verde);
-  color: var(--verde);
-  font: 700 12px var(--mono);
-  letter-spacing: 0.06em;
+/* formiche e ragno si possono cliccare; l'area del clic è un po' più grande del disegno */
+.formica,
+.ragno {
+  pointer-events: auto;
   cursor: pointer;
-  animation: respiro 1.5s ease-in-out infinite;
 }
 
-.zona-briciole[hidden] {
+.formica::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+#regina,
+#regina-nuova {
+  cursor: pointer;
+}
+
+/* la creatura scelta col clic: alone bianco */
+.creatura.scelta {
+  z-index: 1;
+  filter: drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 6px #ffffff);
+}
+
+/* formica morta: grigia, con le zampe ferme */
+.morta {
+  filter: none;
+}
+
+.morta ellipse,
+.morta circle {
+  fill: var(--grigio);
+}
+
+.morta path {
+  stroke: var(--grigio);
+}
+
+.morta .zampe-a,
+.morta .zampe-b {
+  animation: none;
+}
+
+.morta .zampe-b {
+  opacity: 0;
+}
+
+/* le becchine portano le morte al cimitero */
+.porta-corpo .carico {
+  display: inline;
+  fill: var(--grigio);
+}
+
+/* le ali ci sono solo nelle alate, e sbattono veloci */
+.formica .ali {
   display: none;
+}
+
+.alata .ali {
+  display: inline;
+  fill: rgba(255, 255, 255, 0.5);
+  stroke: none;
+  animation: sbatte 0.1s steps(2) infinite;
+}
+
+/* NOTTE: un velo scuro con luna e stelle, che arriva e se ne va piano (tramonto e alba) */
+.velo-notte {
+  position: absolute;
+  top: -300px;
+  bottom: -300px;
+  left: -2000px;
+  right: -2000px;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 3s;
+  pointer-events: none;
+}
+
+.mondo.notte .velo-notte {
+  opacity: 1;
+}
+
+/* il cielo con la luna, nella stessa posizione del formicaio */
+.cielo-notte {
+  position: absolute;
+  top: 300px;
+  left: 2000px;
+  width: 960px;
+  height: 90px;
+}
+
+/* INVERNO: neve che cade, terreno bianco, niente erba */
+.neve {
+  display: none;
+}
+
+.mondo.inverno .neve {
+  display: inline;
+}
+
+.mondo.inverno .erba {
+  display: none;
+}
+
+.mondo.inverno .terreno {
+  stroke: var(--testo);
+}
+
+.fiocco {
+  fill: var(--testo);
+  animation: nevica 4s linear infinite;
+}
+
+/* LA SCHEDA DI UNA FORMICA, in basso a sinistra */
+.scheda {
+  position: absolute;
+  left: 16px;
+  bottom: 60px;
+  z-index: 3;
+  width: 280px;
+  background: var(--sfondo);
+  border: 1px solid var(--verde);
+  box-shadow: 0 0 24px rgba(0, 255, 65, 0.25);
+  animation: appari 0.2s ease;
+}
+
+.scheda[hidden] {
+  display: none;
+}
+
+.scheda-testo {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-line;          /* rispetta gli "a capo" */
+}
+
+@keyframes sbatte {
+  50% { opacity: 0.2; }
+}
+
+@keyframes nevica {
+  from { transform: translateY(-10px); opacity: 0; }
+  20%  { opacity: 1; }
+  to   { transform: translateY(80px); opacity: 0; }
 }
 
 @keyframes ragno {
@@ -1910,10 +1998,11 @@ h2::before {
   to { stroke-dashoffset: -24; }
 }
 
-/* Per chi ha chiesto al computer di ridurre le animazioni: niente formiche in movimento */
+/* Per chi ha chiesto al computer di ridurre le animazioni: le zampe stanno ferme */
 @media (prefers-reduced-motion: reduce) {
-  .formica {
-    display: none;
+  .zampe-a,
+  .zampe-b {
+    animation: none;
   }
 }
 

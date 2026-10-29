@@ -110,18 +110,48 @@
           <circle cx="120" cy="140" r="1.6"></circle><circle cx="260" cy="180" r="1.4"></circle><circle cx="350" cy="120" r="1.8"></circle><circle cx="600" cy="260" r="1.5"></circle><circle cx="720" cy="230" r="1.6"></circle><circle cx="880" cy="200" r="1.4"></circle><circle cx="150" cy="420" r="1.8"></circle><circle cx="420" cy="500" r="1.5"></circle><circle cx="560" cy="420" r="1.6"></circle><circle cx="700" cy="480" r="1.4"></circle><circle cx="900" cy="520" r="1.7"></circle><circle cx="80" cy="520" r="1.5"></circle><circle cx="620" cy="520" r="1.6"></circle><circle cx="780" cy="300" r="1.5"></circle><circle cx="360" cy="250" r="1.4"></circle><circle cx="470" cy="420" r="1.7"></circle>
         </g>
         <!-- ciuffi d'erba e linea del terreno con la collinetta del formicaio -->
-        <path d="M60 90 l-3 -10 M64 90 l1 -14 M68 90 l4 -9 M180 90 l-2 -9 M184 90 l2 -12 M300 90 l-3 -11 M304 90 l1 -8 M640 90 l-2 -12 M644 90 l3 -9 M760 90 l-3 -9 M764 90 l1 -13 M768 90 l3 -8 M900 90 l-2 -11 M904 90 l2 -9" stroke="#1c5a2a" stroke-width="1.5"></path>
-        <path d="M-1000 90 H400 Q480 34 560 90 H2000" stroke="#1c2b1f" stroke-width="2"></path>
+        <path class="erba" d="M60 90 l-3 -10 M64 90 l1 -14 M68 90 l4 -9 M180 90 l-2 -9 M184 90 l2 -12 M300 90 l-3 -11 M304 90 l1 -8 M640 90 l-2 -12 M644 90 l3 -9 M760 90 l-3 -9 M764 90 l1 -13 M768 90 l3 -8 M900 90 l-2 -11 M904 90 l2 -9" stroke="#1c5a2a" stroke-width="1.5"></path>
+        <path class="terreno" d="M-1000 90 H400 Q480 34 560 90 H2000" stroke="#1c2b1f" stroke-width="2"></path>
+
+        <!-- I SENTIERI IN SUPERFICIE (invisibili): le formiche li usano per uscire a cercare cibo -->
+        <path id="t-fuori-erba" d="M1150 84 H760"></path>
+        <path id="t-erba-buco" d="M760 84 H556 Q520 50 480 62"></path>
+        <path id="t-fuori-cimitero" d="M-260 84 H180"></path>
+        <path id="t-cimitero-buco" d="M180 84 H404 Q440 50 480 62"></path>
+
+        <!-- IL CIMITERO: il mucchietto lo disegna script.js, un segno per ogni formica morta -->
+        <g id="cimitero-disegno" fill="#8a9a8c"></g>
+        <text x="150" y="108" fill="#8a9a8c" font-family="JetBrains Mono, monospace" font-size="11">\cimitero</text>
+
+        <!-- LA NEVE: si vede solo d'inverno (classe "inverno" su .mondo) -->
+        <g class="neve">
+          <circle class="fiocco" style="animation-delay: 0s" cx="40" cy="10" r="1.6"></circle>
+          <circle class="fiocco" style="animation-delay: -1s" cx="120" cy="4" r="1.3"></circle>
+          <circle class="fiocco" style="animation-delay: -2.2s" cx="200" cy="12" r="1.8"></circle>
+          <circle class="fiocco" style="animation-delay: -0.5s" cx="280" cy="6" r="1.4"></circle>
+          <circle class="fiocco" style="animation-delay: -3s" cx="360" cy="10" r="1.6"></circle>
+          <circle class="fiocco" style="animation-delay: -1.6s" cx="440" cy="2" r="1.3"></circle>
+          <circle class="fiocco" style="animation-delay: -2.7s" cx="530" cy="8" r="1.8"></circle>
+          <circle class="fiocco" style="animation-delay: -0.8s" cx="610" cy="12" r="1.4"></circle>
+          <circle class="fiocco" style="animation-delay: -3.4s" cx="690" cy="4" r="1.6"></circle>
+          <circle class="fiocco" style="animation-delay: -1.3s" cx="770" cy="10" r="1.3"></circle>
+          <circle class="fiocco" style="animation-delay: -2.4s" cx="850" cy="6" r="1.8"></circle>
+          <circle class="fiocco" style="animation-delay: -0.2s" cx="930" cy="12" r="1.4"></circle>
+        </g>
 
         <!-- TUNNEL E CAMERE: data-camera dice da quante camere scavate in su si vede quel pezzo
              (1 = regina, 2 = uova, 3 = cibo, 4 = scorte, 5 = caserma).
              Prima disegno tutti i bordi, poi tutti gli interni scuri: così i bordi non coprono gli incroci -->
         <g stroke="#1c2b1f" stroke-width="20">
-          <path data-camera="1" d="M480 62 C470 130 530 170 510 230 C590 250 650 290 700 320 S790 370 830 410"></path>
-          <path data-camera="2" d="M510 230 C490 290 430 310 400 350 C370 390 330 410 300 460"></path>
-          <path data-camera="3" d="M400 350 C360 335 300 325 262 300"></path>
-          <path data-camera="4" d="M492 150 C540 160 590 170 640 180"></path>
-          <path data-camera="5" d="M700 320 C690 380 660 420 640 470"></path>
+          <path data-camera="1" d="M480 62 C474 95 480 125 492 150"></path>
+          <path data-camera="1" d="M492 150 C504 175 518 200 510 230"></path>
+          <path data-camera="1" d="M510 230 C590 250 650 290 700 320"></path>
+          <path data-camera="1" d="M700 320 C740 345 770 370 800 398"></path>
+          <path data-camera="2" d="M510 230 C490 290 430 310 400 350"></path>
+          <path data-camera="2" d="M400 350 C370 390 340 420 310 455"></path>
+          <path data-camera="3" d="M400 350 C360 335 310 325 275 303"></path>
+          <path data-camera="4" d="M492 150 C540 160 590 170 630 178"></path>
+          <path data-camera="5" d="M700 320 C690 380 665 420 645 465"></path>
         </g>
         <g fill="#1c2b1f">
           <ellipse data-camera="1" cx="830" cy="410" rx="72" ry="30"></ellipse>
@@ -130,12 +160,17 @@
           <ellipse data-camera="4" cx="650" cy="180" rx="44" ry="19"></ellipse>
           <ellipse data-camera="5" cx="640" cy="480" rx="54" ry="22"></ellipse>
         </g>
+        <!-- gli interni dei tunnel hanno un id: sono i percorsi che seguono le formiche (TRATTI in script.js) -->
         <g stroke="#07150b" stroke-width="16">
-          <path data-camera="1" d="M480 62 C470 130 530 170 510 230 C590 250 650 290 700 320 S790 370 830 410"></path>
-          <path data-camera="2" d="M510 230 C490 290 430 310 400 350 C370 390 330 410 300 460"></path>
-          <path data-camera="3" d="M400 350 C360 335 300 325 262 300"></path>
-          <path data-camera="4" d="M492 150 C540 160 590 170 640 180"></path>
-          <path data-camera="5" d="M700 320 C690 380 660 420 640 470"></path>
+          <path id="t-buco-j1" data-camera="1" d="M480 62 C474 95 480 125 492 150"></path>
+          <path id="t-j1-j2" data-camera="1" d="M492 150 C504 175 518 200 510 230"></path>
+          <path id="t-j2-j4" data-camera="1" d="M510 230 C590 250 650 290 700 320"></path>
+          <path id="t-j4-regina" data-camera="1" d="M700 320 C740 345 770 370 800 398"></path>
+          <path id="t-j2-j3" data-camera="2" d="M510 230 C490 290 430 310 400 350"></path>
+          <path id="t-j3-uova" data-camera="2" d="M400 350 C370 390 340 420 310 455"></path>
+          <path id="t-j3-cibo" data-camera="3" d="M400 350 C360 335 310 325 275 303"></path>
+          <path id="t-j1-scorte" data-camera="4" d="M492 150 C540 160 590 170 630 178"></path>
+          <path id="t-j4-caserma" data-camera="5" d="M700 320 C690 380 665 420 645 465"></path>
         </g>
         <g fill="#07150b">
           <ellipse data-camera="1" cx="830" cy="410" rx="70" ry="28"></ellipse>
@@ -147,10 +182,6 @@
         <!-- il buco d'ingresso in cima alla collinetta -->
         <ellipse cx="480" cy="62" rx="9" ry="4" fill="#000000"></ellipse>
 
-        <!-- camera delle uova -->
-        <g data-camera="2" fill="#e6e6e6">
-          <ellipse cx="278" cy="462" rx="3.2" ry="4.4"></ellipse><ellipse cx="290" cy="457" rx="3.2" ry="4.4"></ellipse><ellipse cx="302" cy="463" rx="3.2" ry="4.4"></ellipse><ellipse cx="314" cy="458" rx="3.2" ry="4.4"></ellipse><ellipse cx="326" cy="463" rx="3.2" ry="4.4"></ellipse><ellipse cx="296" cy="470" rx="3.2" ry="4.4"></ellipse><ellipse cx="310" cy="469" rx="3.2" ry="4.4"></ellipse>
-        </g>
         <!-- camera del cibo: foglie e semi -->
         <g data-camera="3">
           <g fill="#0f8a2c">
@@ -174,8 +205,11 @@
           <text data-camera="5" x="606" y="450">\caserma</text>
         </g>
 
+        <!-- le uova: le disegna script.js, tante quante sono davvero -->
+        <g id="uova-disegno" fill="#e6e6e6"></g>
+
         <!-- la regina: una formica più grande, con la corona -->
-        <g transform="translate(838 412) scale(2.2) translate(-12 -7)">
+        <g id="regina" transform="translate(838 412) scale(2.2) translate(-12 -7)">
           <path d="M11 7 L7.5 2.8 M12.3 7 L12 2 M13.5 7 L16.5 3 M11 7 L9 11.5 M12.3 7 L13.5 12 M13.5 7 L17.5 11 M19 5.6 L22 3 M19 8.4 L22 11" stroke="#00ff41" stroke-width="0.9"></path>
           <ellipse cx="6" cy="7" rx="4.8" ry="3.3" fill="#00ff41"></ellipse>
           <ellipse cx="12.2" cy="7" rx="2.4" ry="1.7" fill="#00ff41"></ellipse>
@@ -183,10 +217,23 @@
           <path d="M4.2 4.2 V9.8 M7.2 3.8 V10.2" stroke="#000000" stroke-width="0.6"></path>
           <path d="M15.4 4.4 L15.8 2.6 L16.7 3.6 L17.2 2.2 L17.7 3.6 L18.6 2.6 L19 4.4 Z" fill="#ffffff"></path>
         </g>
+        <!-- la nuova regina mentre cresce (seconda vita): un uovo grande con una piccola corona -->
+        <g id="regina-nuova" style="display: none">
+          <ellipse cx="832" cy="414" rx="8" ry="11" fill="#e6e6e6"></ellipse>
+          <path d="M826 401 L827 395 L830 398 L832 393 L834 398 L837 395 L838 401 Z" fill="#00ff41"></path>
+        </g>
       </svg>
 
-      <!-- La formica "modello": script.js la copia per fare operaie, soldate e nemiche -->
-      <div class="formica" id="modello-formica" hidden>
+      <!-- IL VELO DELLA NOTTE: scurisce il formicaio e mostra luna e stelle (classe "notte" su .mondo) -->
+      <div class="velo-notte">
+        <svg class="cielo-notte" viewBox="0 0 960 90" aria-hidden="true">
+          <path d="M904 14 a16 16 0 1 0 14 26 a12 12 0 1 1 -14 -26 z" fill="#e6e6e6"></path>
+          <g fill="#e6e6e6"><circle cx="90" cy="20" r="1"></circle><circle cx="230" cy="40" r="1.2"></circle><circle cx="380" cy="14" r="1"></circle><circle cx="620" cy="30" r="1.2"></circle><circle cx="760" cy="12" r="1"></circle><circle cx="840" cy="48" r="1"></circle></g>
+        </svg>
+      </div>
+
+      <!-- La formica "modello": script.js la copia per fare operaie, soldate, nemiche e alate -->
+      <div class="creatura formica" id="modello-formica" hidden>
         <svg viewBox="0 0 24 14" aria-hidden="true">
           <!-- due posizioni delle zampe che si alternano: sembra che cammini -->
           <path class="zampe-a" d="M11 7 L7.5 2.8 M12.3 7 L12 2 M13.5 7 L16.5 3 M11 7 L9 11.5 M12.3 7 L13.5 12 M13.5 7 L17.5 11"></path>
@@ -196,27 +243,24 @@
           <ellipse cx="12.2" cy="7" rx="2.4" ry="1.7"></ellipse>    <!-- torace -->
           <circle cx="17.2" cy="7" r="2.4"></circle>                <!-- testa -->
           <path class="strisce" d="M4.2 4.2 V9.8 M7.2 3.8 V10.2"></path>
-          <rect class="carico" x="20.5" y="5" width="3.5" height="4" rx="0.6"></rect>  <!-- briciola o foglia -->
+          <rect class="carico" x="20.5" y="5" width="3.5" height="4" rx="0.6"></rect>  <!-- briciola, foglia, uovo o morta -->
+          <g class="ali"><ellipse cx="9" cy="2.5" rx="6" ry="2.4"></ellipse><ellipse cx="9" cy="11.5" rx="6" ry="2.4"></ellipse></g>  <!-- solo le alate -->
         </svg>
       </div>
 
-      <!-- I PERICOLI: nascosti, script.js ne mostra uno quando arriva.
-           Ognuno ha un pulsante "colpisci" e una scritta con la vita che resta (■■■□□) -->
-      <div class="pericolo" id="pericolo-ragno" hidden>
-        <button class="colpisci ragno" aria-label="Colpisci il ragno">
-          <svg viewBox="-30 -20 60 64" aria-hidden="true">
-            <path d="M-5 -2 Q-16 -14 -24 -6 M-5 2 Q-18 -2 -26 8 M-5 5 Q-16 12 -22 22 M-4 8 Q-10 20 -14 30 M5 -2 Q16 -14 24 -6 M5 2 Q18 -2 26 8 M5 5 Q16 12 22 22 M4 8 Q10 20 14 30"></path>
-            <ellipse cx="0" cy="12" rx="8" ry="10"></ellipse>   <!-- corpo -->
-            <circle cx="0" cy="-2" r="6"></circle>              <!-- testa -->
-            <circle class="occhi" cx="-2.2" cy="-4" r="1.4"></circle>
-            <circle class="occhi" cx="2.2" cy="-4" r="1.4"></circle>
-          </svg>
-        </button>
-        <span class="aiuto">CLICCA IL RAGNO <span class="vita"></span></span>
+      <!-- Il ragno "modello": script.js lo copia quando arriva il pericolo -->
+      <div class="creatura ragno" id="modello-ragno" hidden>
+        <svg viewBox="-30 -20 60 64" aria-hidden="true">
+          <path d="M-5 -2 Q-16 -14 -24 -6 M-5 2 Q-18 -2 -26 8 M-5 5 Q-16 12 -22 22 M-4 8 Q-10 20 -14 30 M5 -2 Q16 -14 24 -6 M5 2 Q18 -2 26 8 M5 5 Q16 12 22 22 M4 8 Q10 20 14 30"></path>
+          <ellipse cx="0" cy="12" rx="8" ry="10"></ellipse>   <!-- corpo -->
+          <circle cx="0" cy="-2" r="6"></circle>              <!-- testa -->
+          <circle class="occhi" cx="-2.2" cy="-4" r="1.4"></circle>
+          <circle class="occhi" cx="2.2" cy="-4" r="1.4"></circle>
+        </svg>
       </div>
 
-      <div class="pericolo" id="pericolo-pioggia" hidden>
-        <!-- gocce che cadono e acqua che scende nel tunnel principale -->
+      <!-- LA PIOGGIA: gocce che cadono e acqua che entra nel tunnel principale -->
+      <div class="pericolo" id="pioggia" hidden>
         <svg class="pioggia-disegno" viewBox="0 0 960 552" aria-hidden="true">
           <path class="goccia" style="animation-delay: 0s" d="M30 30 l-3 10"></path>
           <path class="goccia" style="animation-delay: -0.3s" d="M110 36 l-3 10"></path>
@@ -230,21 +274,10 @@
           <path class="goccia" style="animation-delay: -0.35s" d="M760 32 l-3 10"></path>
           <path class="goccia" style="animation-delay: -0.65s" d="M840 30 l-3 10"></path>
           <path class="goccia" style="animation-delay: -0.1s" d="M920 36 l-3 10"></path>
-          <path class="acqua" d="M480 64 C470 130 530 170 510 230"></path>
-          <path class="rivolo" d="M480 64 C470 130 530 170 510 230"></path>
+          <path id="acqua" class="acqua" d="M480 62 C474 95 480 125 492 150 C504 175 518 200 510 230"></path>
+          <path class="rivolo" d="M480 62 C474 95 480 125 492 150 C504 175 518 200 510 230"></path>
         </svg>
-        <button class="colpisci acqua-bottone" aria-label="Scava un canale per togliere l'acqua"></button>
-        <span class="aiuto">CLICCA SULL'ACQUA <span class="vita"></span></span>
       </div>
-
-      <!-- le formiche nemiche (bianche) le aggiunge script.js copiando la formica modello -->
-      <div class="pericolo" id="pericolo-nemiche" hidden>
-        <button class="colpisci nemiche-bottone" aria-label="Colpisci le formiche nemiche"></button>
-        <span class="aiuto">CLICCA LE NEMICHE <span class="vita"></span></span>
-      </div>
-
-      <!-- FAME: compare quando il cibo è quasi finito -->
-      <button id="zona-briciole" class="zona-briciole" hidden>FAME! CLICCA QUI PER LASCIARE BRICIOLE</button>
     </div>
 
     <!-- ICONE: data-app dice a script.js quale programma aprire -->
@@ -310,8 +343,11 @@
         <p id="colonia-stato" class="colonia-stato">STATO: TRANQUILLA</p>
         <dl class="colonia-numeri">
           <dt>GIORNO</dt>  <dd id="colonia-giorno"></dd>
+          <dt>REGINA</dt>  <dd id="colonia-regina"></dd>
+          <dt>TEMPO</dt>   <dd id="colonia-tempo"></dd>
           <dt>OPERAIE</dt> <dd id="colonia-operaie"></dd>
           <dt>SOLDATE</dt> <dd id="colonia-soldate"></dd>
+          <dt>UOVA</dt>    <dd id="colonia-uova"></dd>
           <dt>CIBO</dt>    <dd class="riga-cibo"><span class="barra-cibo"><span id="colonia-cibo-barra"></span></span><span id="colonia-cibo"></span></dd>
           <dt>CAMERE</dt>  <dd id="colonia-camere"></dd>
         </dl>
@@ -319,6 +355,15 @@
         <div id="colonia-diario" class="colonia-diario"></div>
         <button id="nuova-colonia" class="finestra-ok" hidden>[ NUOVA COLONIA ]</button>
       </div>
+    </div>
+
+    <!-- SCHEDA DI UNA FORMICA: si apre cliccando una formica, il ragno o la regina -->
+    <div id="scheda" class="scheda" hidden>
+      <div class="finestra-barra">
+        <span id="scheda-titolo"></span>
+        <button id="scheda-chiudi" aria-label="Chiudi">✕</button>
+      </div>
+      <p id="scheda-testo" class="scheda-testo"></p>
     </div>
 
     <!-- FINESTRA DEI MESSAGGI (Accesso negato, Phonix): i testi li scrive script.js -->
