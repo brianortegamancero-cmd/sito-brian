@@ -99,7 +99,7 @@
   </footer>
 
   <!-- DESKTOP DI BRAINOS (pulsante giallo): resta nascosto finché non lo apri.
-       script.js lo apre, lo chiude e fa funzionare icone, menu start, orologio e batteria -->
+       script.js lo apre, lo chiude e fa funzionare icone, menu start, orologio, batteria e la colonia -->
   <div id="desktop" class="desktop" hidden>
 
     <!-- SFONDO: il formicaio, un disegno SVG grande 960 x 552 pixel -->
@@ -113,55 +113,65 @@
         <path d="M60 90 l-3 -10 M64 90 l1 -14 M68 90 l4 -9 M180 90 l-2 -9 M184 90 l2 -12 M300 90 l-3 -11 M304 90 l1 -8 M640 90 l-2 -12 M644 90 l3 -9 M760 90 l-3 -9 M764 90 l1 -13 M768 90 l3 -8 M900 90 l-2 -11 M904 90 l2 -9" stroke="#1c5a2a" stroke-width="1.5"></path>
         <path d="M-1000 90 H400 Q480 34 560 90 H2000" stroke="#1c2b1f" stroke-width="2"></path>
 
-        <!-- tunnel e camere: prima il bordo (più largo), poi l'interno scuro sopra -->
+        <!-- TUNNEL E CAMERE: data-camera dice da quante camere scavate in su si vede quel pezzo
+             (1 = regina, 2 = uova, 3 = cibo, 4 = scorte, 5 = caserma).
+             Prima disegno tutti i bordi, poi tutti gli interni scuri: così i bordi non coprono gli incroci -->
         <g stroke="#1c2b1f" stroke-width="20">
-          <path d="M480 62 C470 130 530 170 510 230 S430 310 400 350 S330 410 300 460"></path>
-          <path d="M510 230 C590 250 650 290 700 320 S790 370 830 410"></path>
-          <path d="M400 350 C360 335 300 325 262 300"></path>
-          <path d="M492 150 C540 160 590 170 640 180"></path>
+          <path data-camera="1" d="M480 62 C470 130 530 170 510 230 C590 250 650 290 700 320 S790 370 830 410"></path>
+          <path data-camera="2" d="M510 230 C490 290 430 310 400 350 C370 390 330 410 300 460"></path>
+          <path data-camera="3" d="M400 350 C360 335 300 325 262 300"></path>
+          <path data-camera="4" d="M492 150 C540 160 590 170 640 180"></path>
+          <path data-camera="5" d="M700 320 C690 380 660 420 640 470"></path>
         </g>
         <g fill="#1c2b1f">
-          <ellipse cx="262" cy="300" rx="52" ry="22"></ellipse>
-          <ellipse cx="830" cy="410" rx="72" ry="30"></ellipse>
-          <ellipse cx="300" cy="460" rx="60" ry="24"></ellipse>
-          <ellipse cx="650" cy="180" rx="44" ry="19"></ellipse>
+          <ellipse data-camera="1" cx="830" cy="410" rx="72" ry="30"></ellipse>
+          <ellipse data-camera="2" cx="300" cy="460" rx="60" ry="24"></ellipse>
+          <ellipse data-camera="3" cx="262" cy="300" rx="52" ry="22"></ellipse>
+          <ellipse data-camera="4" cx="650" cy="180" rx="44" ry="19"></ellipse>
+          <ellipse data-camera="5" cx="640" cy="480" rx="54" ry="22"></ellipse>
         </g>
         <g stroke="#07150b" stroke-width="16">
-          <path d="M480 62 C470 130 530 170 510 230 S430 310 400 350 S330 410 300 460"></path>
-          <path d="M510 230 C590 250 650 290 700 320 S790 370 830 410"></path>
-          <path d="M400 350 C360 335 300 325 262 300"></path>
-          <path d="M492 150 C540 160 590 170 640 180"></path>
+          <path data-camera="1" d="M480 62 C470 130 530 170 510 230 C590 250 650 290 700 320 S790 370 830 410"></path>
+          <path data-camera="2" d="M510 230 C490 290 430 310 400 350 C370 390 330 410 300 460"></path>
+          <path data-camera="3" d="M400 350 C360 335 300 325 262 300"></path>
+          <path data-camera="4" d="M492 150 C540 160 590 170 640 180"></path>
+          <path data-camera="5" d="M700 320 C690 380 660 420 640 470"></path>
         </g>
         <g fill="#07150b">
-          <ellipse cx="262" cy="300" rx="50" ry="20"></ellipse>
-          <ellipse cx="830" cy="410" rx="70" ry="28"></ellipse>
-          <ellipse cx="300" cy="460" rx="58" ry="22"></ellipse>
-          <ellipse cx="650" cy="180" rx="42" ry="17"></ellipse>
+          <ellipse data-camera="1" cx="830" cy="410" rx="70" ry="28"></ellipse>
+          <ellipse data-camera="2" cx="300" cy="460" rx="58" ry="22"></ellipse>
+          <ellipse data-camera="3" cx="262" cy="300" rx="50" ry="20"></ellipse>
+          <ellipse data-camera="4" cx="650" cy="180" rx="42" ry="17"></ellipse>
+          <ellipse data-camera="5" cx="640" cy="480" rx="52" ry="20"></ellipse>
         </g>
+        <!-- il buco d'ingresso in cima alla collinetta -->
         <ellipse cx="480" cy="62" rx="9" ry="4" fill="#000000"></ellipse>
 
-        <!-- camera del cibo: foglie e semi -->
-        <g fill="#0f8a2c">
-          <ellipse cx="240" cy="302" rx="5" ry="2.2" transform="rotate(-25 240 302)"></ellipse>
-          <ellipse cx="254" cy="296" rx="5" ry="2.2" transform="rotate(15 254 296)"></ellipse>
-          <ellipse cx="268" cy="304" rx="5" ry="2.2" transform="rotate(-10 268 304)"></ellipse>
-          <ellipse cx="282" cy="298" rx="5" ry="2.2" transform="rotate(30 282 298)"></ellipse>
-        </g>
-        <!-- semi (camera del cibo) e uova (camera delle uova) -->
-        <g fill="#e6e6e6">
-          <circle cx="248" cy="307" r="1.8"></circle><circle cx="274" cy="293" r="1.8"></circle><circle cx="262" cy="309" r="1.8"></circle>
+        <!-- camera delle uova -->
+        <g data-camera="2" fill="#e6e6e6">
           <ellipse cx="278" cy="462" rx="3.2" ry="4.4"></ellipse><ellipse cx="290" cy="457" rx="3.2" ry="4.4"></ellipse><ellipse cx="302" cy="463" rx="3.2" ry="4.4"></ellipse><ellipse cx="314" cy="458" rx="3.2" ry="4.4"></ellipse><ellipse cx="326" cy="463" rx="3.2" ry="4.4"></ellipse><ellipse cx="296" cy="470" rx="3.2" ry="4.4"></ellipse><ellipse cx="310" cy="469" rx="3.2" ry="4.4"></ellipse>
         </g>
+        <!-- camera del cibo: foglie e semi -->
+        <g data-camera="3">
+          <g fill="#0f8a2c">
+            <ellipse cx="240" cy="302" rx="5" ry="2.2" transform="rotate(-25 240 302)"></ellipse>
+            <ellipse cx="254" cy="296" rx="5" ry="2.2" transform="rotate(15 254 296)"></ellipse>
+            <ellipse cx="268" cy="304" rx="5" ry="2.2" transform="rotate(-10 268 304)"></ellipse>
+            <ellipse cx="282" cy="298" rx="5" ry="2.2" transform="rotate(30 282 298)"></ellipse>
+          </g>
+          <g fill="#e6e6e6"><circle cx="248" cy="307" r="1.8"></circle><circle cx="274" cy="293" r="1.8"></circle><circle cx="262" cy="309" r="1.8"></circle></g>
+        </g>
         <!-- camera delle scorte: briciole -->
-        <g fill="#8a9a8c">
+        <g data-camera="4" fill="#8a9a8c">
           <rect x="632" y="178" width="4" height="4"></rect><rect x="640" y="183" width="3" height="3"></rect><rect x="648" y="176" width="5" height="4"></rect><rect x="658" y="182" width="4" height="3"></rect><rect x="666" y="178" width="3" height="3"></rect>
         </g>
         <!-- i nomi delle camere, scritti come cartelle -->
         <g fill="#8a9a8c" font-family="JetBrains Mono, monospace" font-size="11">
-          <text x="232" y="272">\cibo</text>
-          <text x="276" y="430">\uova</text>
-          <text x="800" y="374">\regina</text>
-          <text x="628" y="156">\scorte</text>
+          <text data-camera="1" x="800" y="374">\regina</text>
+          <text data-camera="2" x="276" y="430">\uova</text>
+          <text data-camera="3" x="232" y="272">\cibo</text>
+          <text data-camera="4" x="628" y="156">\scorte</text>
+          <text data-camera="5" x="606" y="450">\caserma</text>
         </g>
 
         <!-- la regina: una formica più grande, con la corona -->
@@ -175,7 +185,7 @@
         </g>
       </svg>
 
-      <!-- La formica "modello": script.js la copia 12 volte e ogni copia cammina nel suo tunnel -->
+      <!-- La formica "modello": script.js la copia per fare operaie, soldate e nemiche -->
       <div class="formica" id="modello-formica" hidden>
         <svg viewBox="0 0 24 14" aria-hidden="true">
           <!-- due posizioni delle zampe che si alternano: sembra che cammini -->
@@ -189,6 +199,52 @@
           <rect class="carico" x="20.5" y="5" width="3.5" height="4" rx="0.6"></rect>  <!-- briciola o foglia -->
         </svg>
       </div>
+
+      <!-- I PERICOLI: nascosti, script.js ne mostra uno quando arriva.
+           Ognuno ha un pulsante "colpisci" e una scritta con la vita che resta (■■■□□) -->
+      <div class="pericolo" id="pericolo-ragno" hidden>
+        <button class="colpisci ragno" aria-label="Colpisci il ragno">
+          <svg viewBox="-30 -20 60 64" aria-hidden="true">
+            <path d="M-5 -2 Q-16 -14 -24 -6 M-5 2 Q-18 -2 -26 8 M-5 5 Q-16 12 -22 22 M-4 8 Q-10 20 -14 30 M5 -2 Q16 -14 24 -6 M5 2 Q18 -2 26 8 M5 5 Q16 12 22 22 M4 8 Q10 20 14 30"></path>
+            <ellipse cx="0" cy="12" rx="8" ry="10"></ellipse>   <!-- corpo -->
+            <circle cx="0" cy="-2" r="6"></circle>              <!-- testa -->
+            <circle class="occhi" cx="-2.2" cy="-4" r="1.4"></circle>
+            <circle class="occhi" cx="2.2" cy="-4" r="1.4"></circle>
+          </svg>
+        </button>
+        <span class="aiuto">CLICCA IL RAGNO <span class="vita"></span></span>
+      </div>
+
+      <div class="pericolo" id="pericolo-pioggia" hidden>
+        <!-- gocce che cadono e acqua che scende nel tunnel principale -->
+        <svg class="pioggia-disegno" viewBox="0 0 960 552" aria-hidden="true">
+          <path class="goccia" style="animation-delay: 0s" d="M30 30 l-3 10"></path>
+          <path class="goccia" style="animation-delay: -0.3s" d="M110 36 l-3 10"></path>
+          <path class="goccia" style="animation-delay: -0.6s" d="M190 28 l-3 10"></path>
+          <path class="goccia" style="animation-delay: -0.15s" d="M270 34 l-3 10"></path>
+          <path class="goccia" style="animation-delay: -0.45s" d="M350 30 l-3 10"></path>
+          <path class="goccia" style="animation-delay: -0.75s" d="M430 26 l-3 10"></path>
+          <path class="goccia" style="animation-delay: -0.2s" d="M520 26 l-3 10"></path>
+          <path class="goccia" style="animation-delay: -0.5s" d="M600 34 l-3 10"></path>
+          <path class="goccia" style="animation-delay: -0.8s" d="M680 28 l-3 10"></path>
+          <path class="goccia" style="animation-delay: -0.35s" d="M760 32 l-3 10"></path>
+          <path class="goccia" style="animation-delay: -0.65s" d="M840 30 l-3 10"></path>
+          <path class="goccia" style="animation-delay: -0.1s" d="M920 36 l-3 10"></path>
+          <path class="acqua" d="M480 64 C470 130 530 170 510 230"></path>
+          <path class="rivolo" d="M480 64 C470 130 530 170 510 230"></path>
+        </svg>
+        <button class="colpisci acqua-bottone" aria-label="Scava un canale per togliere l'acqua"></button>
+        <span class="aiuto">CLICCA SULL'ACQUA <span class="vita"></span></span>
+      </div>
+
+      <!-- le formiche nemiche (bianche) le aggiunge script.js copiando la formica modello -->
+      <div class="pericolo" id="pericolo-nemiche" hidden>
+        <button class="colpisci nemiche-bottone" aria-label="Colpisci le formiche nemiche"></button>
+        <span class="aiuto">CLICCA LE NEMICHE <span class="vita"></span></span>
+      </div>
+
+      <!-- FAME: compare quando il cibo è quasi finito -->
+      <button id="zona-briciole" class="zona-briciole" hidden>FAME! CLICCA QUI PER LASCIARE BRICIOLE</button>
     </div>
 
     <!-- ICONE: data-app dice a script.js quale programma aprire -->
@@ -200,6 +256,10 @@
       <button class="icona" data-app="terminale">
         <span class="icona-disegno"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3z M8 20h8 M12 16v4 M6 8h5 M6 11h8"></path></svg></span>
         Terminale
+      </button>
+      <button class="icona" data-app="colonia">
+        <span class="icona-disegno"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 19h20 M5 19c2-7 4-10 7-10s5 3 7 10 M11 15h2"></path></svg></span>
+        Colonia
       </button>
       <button class="icona" data-app="phonix">
         <span class="icona-disegno"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2.5h8a1.5 1.5 0 0 1 1.5 1.5v16a1.5 1.5 0 0 1-1.5 1.5H8A1.5 1.5 0 0 1 6.5 20V4A1.5 1.5 0 0 1 8 2.5z M11 18.5h2 M12 7.5c1.6 1.4 2.2 2.6 2.2 3.6a2.2 2.2 0 0 1-4.4 0c0-.9.5-1.6 1.1-2.2"></path></svg></span>
@@ -240,8 +300,29 @@
       </button>
     </div>
 
+    <!-- FINESTRA DELLA COLONIA (colonia.exe): i numeri li scrive script.js -->
+    <div id="finestra-colonia" class="finestra-desktop finestra-colonia" hidden>
+      <div class="finestra-barra">
+        <span>C:\BrainOS\colonia.exe</span>
+        <button id="colonia-chiudi" aria-label="Chiudi">✕</button>
+      </div>
+      <div class="finestra-corpo">
+        <p id="colonia-stato" class="colonia-stato">STATO: TRANQUILLA</p>
+        <dl class="colonia-numeri">
+          <dt>GIORNO</dt>  <dd id="colonia-giorno"></dd>
+          <dt>OPERAIE</dt> <dd id="colonia-operaie"></dd>
+          <dt>SOLDATE</dt> <dd id="colonia-soldate"></dd>
+          <dt>CIBO</dt>    <dd class="riga-cibo"><span class="barra-cibo"><span id="colonia-cibo-barra"></span></span><span id="colonia-cibo"></span></dd>
+          <dt>CAMERE</dt>  <dd id="colonia-camere"></dd>
+        </dl>
+        <p class="colonia-titolo-diario">DIARIO</p>
+        <div id="colonia-diario" class="colonia-diario"></div>
+        <button id="nuova-colonia" class="finestra-ok" hidden>[ NUOVA COLONIA ]</button>
+      </div>
+    </div>
+
     <!-- FINESTRA DEI MESSAGGI (Accesso negato, Phonix): i testi li scrive script.js -->
-    <div id="finestra" class="finestra-desktop" hidden>
+    <div id="finestra" class="finestra-desktop finestra-messaggio" hidden>
       <div class="finestra-barra">
         <span id="finestra-titolo"></span>
         <button id="finestra-chiudi" aria-label="Chiudi">✕</button>
@@ -260,18 +341,20 @@
       <p class="menu-start-titolo">BrainOS v1.0 · utente: Brian</p>
       <button data-app="cmd">CMD</button>
       <button data-app="terminale">Terminale</button>
+      <button data-app="colonia">Colonia</button>
       <button data-app="phonix">Phonix</button>
       <button data-app="cv">CV</button>
       <button data-app="spegni" class="menu-start-spegni">Arresta il sistema</button>
     </div>
 
-    <!-- BARRA DELLE APPLICAZIONI: start a sinistra, Wi-Fi, batteria e orologio a destra -->
+    <!-- BARRA DELLE APPLICAZIONI: start e programmi aperti a sinistra, Wi-Fi, batteria e orologio a destra -->
     <div class="barra-applicazioni">
       <div class="barra-sinistra">
         <button id="start" class="start" aria-expanded="false" aria-controls="menu-start">
           <img src="img/icona.svg" alt="">
           start
         </button>
+        <button id="tab-colonia" class="tab-colonia">colonia.exe</button>
         <span id="app-aperta" class="app-aperta" hidden></span>
       </div>
 

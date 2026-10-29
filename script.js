@@ -939,34 +939,15 @@ async function schermataErrore() {
 // 9. PULSANTE GIALLO: IL DESKTOP DI BRAINOS
 //    Il terminale si "riduce" e compare il desktop del sistema operativo del sito.
 //    Il desktop è già scritto in index.html (div #desktop, nascosto):
-//    qui lo apro, lo chiudo e faccio funzionare formiche, icone, menu start, orologio e batteria.
+//    qui lo apro, lo chiudo e faccio funzionare icone, menu start, orologio e batteria.
+//    La colonia di formiche è nella sezione 10.
 
 let desktopAperto = false;
 let orologio = null;   // il timer che aggiorna l'ora ogni secondo
 
-// Le formiche del formicaio:
-// percorso = il tunnel in cui cammina (r1...r5, scritti in style.css)
-// ritardo  = da quanti secondi è già in cammino (così non partono tutte insieme)
-// indietro = cammina al contrario
-// porta    = cosa trasporta (briciola o foglia)
-const FORMICHE = [
-  { percorso: "r1", ritardo: 0 },
-  { percorso: "r1", ritardo: 6 },
-  { percorso: "r1", ritardo: 12, porta: "briciola" },
-  { percorso: "r1", ritardo: 9, indietro: true },
-  { percorso: "r2", ritardo: 0, porta: "briciola" },
-  { percorso: "r2", ritardo: 3.5, porta: "foglia" },
-  { percorso: "r3", ritardo: 0 },
-  { percorso: "r3", ritardo: 2.5, indietro: true, porta: "foglia" },
-  { percorso: "r4", ritardo: 0 },
-  { percorso: "r4", ritardo: 2, indietro: true, porta: "briciola" },
-  { percorso: "r5", ritardo: 3, porta: "foglia" },
-  { percorso: "r5", ritardo: 9, indietro: true }
-];
-
 // Prepara il desktop una volta sola, quando si apre la Home
 function preparaDesktop() {
-  creaFormiche();
+  preparaColonia();
 
   // Ogni icona (e ogni voce del menu start) ha scritto in data-app il programma da aprire
   document.querySelectorAll("#desktop [data-app]").forEach(function (pulsante) {
@@ -988,21 +969,6 @@ function preparaDesktop() {
   });
 }
 
-// Crea le formiche copiando la formica "modello" che si trova in index.html
-function creaFormiche() {
-  const modello = document.getElementById("modello-formica");
-  FORMICHE.forEach(function (dati) {
-    const formica = modello.cloneNode(true);    // una copia del disegno
-    formica.removeAttribute("id");              // l'id deve essere unico: alle copie lo tolgo
-    formica.hidden = false;
-    formica.classList.add(dati.percorso);
-    if (dati.indietro) formica.classList.add("indietro");
-    if (dati.porta) formica.classList.add("porta-" + dati.porta);
-    formica.style.animationDelay = -dati.ritardo + "s";   // ritardo negativo = è già in cammino
-    modello.parentElement.appendChild(formica);
-  });
-}
-
 function apriDesktop() {
   // Da telefono il desktop non ci sta: scrivo un avviso nel terminale e mi fermo
   if (window.innerWidth < 700) {
@@ -1019,6 +985,7 @@ function apriDesktop() {
   orologio = setInterval(aggiornaOra, 1000);   // l'ora si aggiorna ogni secondo
   leggiBatteria();
   leggiConnessione();
+  avviaColonia();                              // la colonia riparte (sezione 10)
 }
 
 function chiudiDesktop() {
@@ -1026,6 +993,7 @@ function chiudiDesktop() {
   document.documentElement.classList.remove("desktop-aperto");
   desktopAperto = false;
   clearInterval(orologio);
+  fermaColonia();
   chiudiMenuStart();
   chiudiFinestra();
 }
@@ -1071,6 +1039,8 @@ function apriApp(nome) {
   } else if (nome === "terminale" || nome === "spegni") {
     chiudiDesktop();                 // si torna al terminale della Home
     window.scrollTo(0, 0);
+  } else if (nome === "colonia") {
+    apriFinestraColonia();
   } else if (nome === "cv") {
     window.location.href = "cv.html";
   } else if (nome === "phonix") {
@@ -1081,7 +1051,7 @@ function apriApp(nome) {
   }
 }
 
-// La finestra dei messaggi in alto a destra (e il suo nome nella barra delle applicazioni)
+// La finestra dei messaggi al centro (e il suo nome nella barra delle applicazioni)
 function mostraFinestra(programma, intestazione, testo) {
   document.getElementById("finestra-titolo").textContent = "C:\\BrainOS\\" + programma;
   document.getElementById("finestra-intestazione").textContent = intestazione;
@@ -1111,7 +1081,393 @@ function chiudiMenuStart() {
 }
 
 
-// 10. PARTENZA: preparo menu ed easter egg (ci sono in tutte le pagine),
+// 10. LA COLONIA DI FORMICHE
+//     Una colonia vera: cresce col tempo, scava camere nuove e affronta pericoli.
+//     Tutto lo stato sta in un oggetto ("colonia") che si salva nel browser (localStorage):
+//     ogni visitatore ha la sua colonia, e quando torna la ritrova cresciuta.
+
+const CHIAVE_COLONIA = "brainos-colonia";   // il nome con cui la salvo nel browser
+const DURATA_GIORNO = 60000;                // 1 giorno della colonia = 60 secondi
+const NOMI_CAMERE = ["", "\\regina", "\\uova", "\\cibo", "\\scorte", "\\caserma"];
+
+// I tunnel dove camminano le formiche (gli stessi disegnati in index.html).
+// camera = da quante camere scavate in su esiste il tunnel, durata = secondi per percorrerlo
+const PERCORSI = [
+  { camera: 1, durata: 14, d: "M1400 84 H560 Q522 52 480 58" },
+  { camera: 1, durata: 10, d: "M-440 84 H400 Q438 52 480 58" },
+  { camera: 1, durata: 12, d: "M480 58 C470 130 530 170 510 230 C590 250 650 290 700 320 S780 370 800 392" },
+  { camera: 2, durata: 7,  d: "M510 230 C490 290 430 310 400 350 C370 390 330 410 300 456" },
+  { camera: 3, durata: 5,  d: "M400 350 C360 335 300 325 270 304" },
+  { camera: 4, durata: 4,  d: "M492 150 C540 160 590 170 630 178" },
+  { camera: 5, durata: 5,  d: "M700 320 C690 380 660 420 645 462" }
+];
+
+// I pericoli che arrivano a caso (la fame invece arriva da sola, quando finisce il cibo)
+const PERICOLI = {
+  ragno:   { inizio: "un ragno è entrato!",         fine: "il ragno è scappato" },
+  pioggia: { inizio: "piove: il tunnel si allaga!", fine: "l'acqua è stata tolta" },
+  nemiche: { inizio: "formiche nemiche in arrivo!", fine: "le nemiche sono scappate" }
+};
+
+let colonia = null;        // lo stato della colonia
+let pericolo = null;       // il pericolo in corso, ad esempio { tipo: "ragno", vita: 5, turni: 0 }
+let timerGiorno = null;    // fa passare i giorni
+let timerPericolo = null;  // ogni 3 secondi fa "muovere" il pericolo
+
+// Una colonia appena nata: la regina e 6 operaie
+function nuovaColonia() {
+  return {
+    giorno: 1,
+    operaie: 6,
+    soldate: 0,
+    cibo: 50,          // da 0 a 100
+    camere: 1,         // da 1 a 5
+    diario: ["> G1 nasce la colonia"],
+    ultimoGiorno: Date.now()   // quando è passato l'ultimo giorno (serve per contare i giorni a sito chiuso)
+  };
+}
+
+// Salva e carica la colonia nel browser.
+// try/catch: in alcuni browser (es. navigazione in incognito) il salvataggio non funziona, e va bene lo stesso
+function salvaColonia() {
+  try {
+    localStorage.setItem(CHIAVE_COLONIA, JSON.stringify(colonia));   // l'oggetto diventa testo
+  } catch (errore) {}
+}
+
+function caricaColonia() {
+  try {
+    colonia = JSON.parse(localStorage.getItem(CHIAVE_COLONIA));      // il testo torna oggetto
+  } catch (errore) {
+    colonia = null;
+  }
+  if (!colonia) colonia = nuovaColonia();   // prima visita: nasce una colonia nuova
+}
+
+// Tiene un numero tra un minimo e un massimo (es. il cibo resta tra 0 e 100)
+function limita(numero, minimo, massimo) {
+  return Math.max(minimo, Math.min(massimo, numero));
+}
+
+function estinta() {
+  return colonia.operaie + colonia.soldate === 0;
+}
+
+// Aggiunge una riga al diario (tengo solo le ultime 5)
+function scriviDiario(testo) {
+  colonia.diario.push("> G" + colonia.giorno + " " + testo);
+  if (colonia.diario.length > 5) colonia.diario.shift();
+}
+
+// Collega i pulsanti della colonia (una volta sola)
+function preparaColonia() {
+  document.querySelectorAll(".colpisci").forEach(function (bottone) {
+    bottone.addEventListener("click", colpisci);
+  });
+  document.getElementById("zona-briciole").addEventListener("click", lasciaBriciole);
+  document.getElementById("colonia-chiudi").addEventListener("click", chiudiFinestraColonia);
+  document.getElementById("tab-colonia").addEventListener("click", cambiaFinestraColonia);
+
+  // Colonia estinta: si ricomincia da capo
+  document.getElementById("nuova-colonia").addEventListener("click", function () {
+    document.querySelectorAll(".mondo .operaia, .mondo .soldata").forEach(function (formica) {
+      formica.remove();
+    });
+    colonia = nuovaColonia();
+    aggiornaColonia();
+  });
+
+  creaNemiche();
+}
+
+// Quando si apre il desktop: carico la colonia, recupero i giorni passati e faccio partire il tempo
+function avviaColonia() {
+  caricaColonia();
+  recuperaGiorniPassati();
+  apriFinestraColonia();
+  aggiornaColonia();
+
+  timerGiorno = setInterval(function () {
+    nuovoGiorno(false);
+    aggiornaColonia();
+  }, DURATA_GIORNO);
+  timerPericolo = setInterval(turnoPericolo, 3000);
+}
+
+// Quando si chiude il desktop: fermo il tempo e salvo
+function fermaColonia() {
+  clearInterval(timerGiorno);
+  clearInterval(timerPericolo);
+  if (pericolo) togliPericolo();
+  salvaColonia();
+}
+
+// Mentre il sito era chiuso: conto quanti giorni sono passati e li faccio passare "tranquilli"
+function recuperaGiorniPassati() {
+  const passati = Math.floor((Date.now() - colonia.ultimoGiorno) / DURATA_GIORNO);
+  const giorni = Math.min(passati, 500);   // al massimo 500, così il calcolo è veloce
+  if (giorni < 1) return;
+
+  const prima = colonia.operaie + colonia.soldate;
+  for (let i = 0; i < giorni; i++) {
+    nuovoGiorno(true);
+  }
+  const dopo = colonia.operaie + colonia.soldate;
+  scriviDiario("mentre eri via: " + giorni + " giorni, formiche " + prima + " → " + dopo);
+}
+
+// UN GIORNO DELLA COLONIA: cibo, nascite, scavo e (ogni tanto) un pericolo.
+// tranquillo = true quando il sito è chiuso: niente morti e niente pericoli
+function nuovoGiorno(tranquillo) {
+  colonia.ultimoGiorno = Date.now();
+  if (estinta()) return;          // colonia estinta: non succede più niente
+  colonia.giorno++;
+
+  // 1. Cibo: le operaie lo raccolgono (un po' a caso), tutte lo mangiano (le soldate il doppio)
+  const raccolto = Math.round(colonia.operaie * (0.3 + Math.random() * 0.4));
+  const mangiato = Math.round((colonia.operaie + colonia.soldate * 2) / 3);
+  colonia.cibo = limita(colonia.cibo + raccolto - mangiato, 0, 100);
+
+  // 2. Fame: se il cibo è finito muore un'operaia
+  if (colonia.cibo === 0 && !tranquillo && colonia.operaie > 0) {
+    colonia.operaie--;
+    scriviDiario("fame: è morta un'operaia");
+    if (estinta()) scriviDiario("la colonia è estinta");
+  }
+
+  // 3. Nascite: la regina depone se c'è cibo e c'è spazio (12 formiche per camera).
+  //    Ogni nuova formica costa 3 di cibo; nasce una soldata ogni 4 operaie
+  const posto = colonia.camere * 12 - (colonia.operaie + colonia.soldate);
+  const nascite = Math.min(1 + Math.floor(colonia.camere / 2), posto);
+  for (let i = 0; i < nascite && colonia.cibo >= 10; i++) {
+    colonia.cibo -= 3;
+    if (colonia.soldate < Math.floor(colonia.operaie / 4)) {
+      colonia.soldate++;
+    } else {
+      colonia.operaie++;
+    }
+  }
+
+  // 4. Scavo: con abbastanza operaie si apre una camera nuova (al massimo 5)
+  if (colonia.camere < 5 && colonia.operaie >= colonia.camere * 8) {
+    colonia.camere++;
+    scriviDiario("nuova camera: " + NOMI_CAMERE[colonia.camere]);
+  }
+
+  // 5. Pericoli: solo mentre guardi, dal giorno 3, 3 volte su 10
+  if (!tranquillo && !pericolo && colonia.giorno >= 3 && Math.random() < 0.3) {
+    const tipi = Object.keys(PERICOLI);                          // ["ragno", "pioggia", "nemiche"]
+    iniziaPericolo(tipi[Math.floor(Math.random() * tipi.length)]);
+  }
+}
+
+// I PERICOLI
+function iniziaPericolo(tipo) {
+  pericolo = { tipo: tipo, vita: 5, turni: 0 };
+  document.getElementById("pericolo-" + tipo).hidden = false;
+  scriviDiario(PERICOLI[tipo].inizio);
+}
+
+// Il pericolo è stato sconfitto (o se n'è andato)
+function finisciPericolo() {
+  scriviDiario(PERICOLI[pericolo.tipo].fine);
+  togliPericolo();
+  aggiornaColonia();
+}
+
+// Nasconde il pericolo senza scrivere niente nel diario
+function togliPericolo() {
+  document.getElementById("pericolo-" + pericolo.tipo).hidden = true;
+  pericolo = null;
+}
+
+// Ogni 3 secondi: la colonia si difende e il pericolo fa danni
+function turnoPericolo() {
+  if (!pericolo) return;
+  pericolo.turni++;
+
+  // Difesa: le soldate combattono ragno e nemiche, le operaie scavano contro l'acqua.
+  // Più difensori ci sono, più è facile colpire (al massimo 6 volte su 10)
+  const difensori = pericolo.tipo === "pioggia" ? colonia.operaie / 3 : colonia.soldate;
+  if (Math.random() < Math.min(0.6, difensori / 10)) pericolo.vita--;
+
+  // Danni (una volta su due)
+  if (Math.random() < 0.5) {
+    if (pericolo.tipo === "ragno") {
+      colonia.operaie = Math.max(0, colonia.operaie - 1);         // il ragno mangia un'operaia
+    } else if (pericolo.tipo === "pioggia") {
+      colonia.cibo = Math.max(0, colonia.cibo - 4);               // l'acqua rovina il cibo
+    } else if (colonia.soldate > 0) {
+      colonia.soldate--;                                          // le nemiche battono una soldata...
+    } else {
+      colonia.operaie = Math.max(0, colonia.operaie - 1);         // ...o un'operaia, se le soldate non ci sono
+    }
+  }
+
+  if (estinta()) {
+    togliPericolo();
+    scriviDiario("la colonia è estinta");
+    aggiornaColonia();
+  } else if (pericolo.vita <= 0 || pericolo.turni >= 10) {
+    finisciPericolo();            // sconfitto, oppure dopo 10 turni (30 secondi) se ne va da solo
+  } else {
+    aggiornaColonia();
+  }
+}
+
+// Clic sul pericolo: gli togli un punto di vita
+function colpisci(evento) {
+  if (!pericolo) return;
+  pericolo.vita--;
+
+  const bottone = evento.currentTarget;
+  bottone.classList.add("colpito");                                 // piccolo lampo verde
+  setTimeout(function () {
+    bottone.classList.remove("colpito");
+  }, 150);
+
+  if (pericolo.vita <= 0) {
+    finisciPericolo();
+  } else {
+    aggiornaColonia();
+  }
+}
+
+// FAME: ogni clic in superficie lascia un po' di briciole
+function lasciaBriciole() {
+  colonia.cibo = Math.min(100, colonia.cibo + 4);
+  aggiornaColonia();
+}
+
+// Le formiche nemiche: 3 copie bianche della formica modello, che partono in momenti diversi
+function creaNemiche() {
+  const modello = document.getElementById("modello-formica");
+  const box = document.getElementById("pericolo-nemiche");
+  for (let i = 0; i < 3; i++) {
+    const nemica = modello.cloneNode(true);
+    nemica.removeAttribute("id");                 // l'id deve essere unico: alle copie lo tolgo
+    nemica.hidden = false;
+    nemica.classList.add("nemica");
+    nemica.style.animationDelay = (-i * 1.6) + "s";
+    box.appendChild(nemica);
+  }
+}
+
+// MOSTRA LA COLONIA SULLO SCHERMO (numeri, stato, diario, camere, formiche) E LA SALVA
+function aggiornaColonia() {
+  const fame = colonia.cibo < 10 && !estinta();
+
+  // I numeri nella finestra colonia.exe
+  document.getElementById("colonia-giorno").textContent = colonia.giorno;
+  document.getElementById("colonia-operaie").textContent = colonia.operaie;
+  document.getElementById("colonia-soldate").textContent = colonia.soldate;
+  document.getElementById("colonia-cibo").textContent = colonia.cibo;
+  document.getElementById("colonia-cibo-barra").style.width = colonia.cibo + "%";
+  // le camere come quadratini: ■ = scavata, □ = ancora da scavare
+  document.getElementById("colonia-camere").textContent =
+    "■".repeat(colonia.camere) + "□".repeat(5 - colonia.camere) + "  " + colonia.camere + "/5";
+
+  // Lo stato (l'ultimo che vale vince: estinta è il più importante)
+  let stato = "TRANQUILLA";
+  if (fame) stato = "FAME";
+  if (pericolo) stato = "IN PERICOLO";
+  if (estinta()) stato = "ESTINTA";
+  const rigaStato = document.getElementById("colonia-stato");
+  rigaStato.textContent = "STATO: " + stato;
+  rigaStato.classList.toggle("allarme", stato !== "TRANQUILLA");
+
+  // La vita che resta al pericolo, come quadratini
+  if (pericolo) {
+    document.querySelector("#pericolo-" + pericolo.tipo + " .vita").textContent =
+      "■".repeat(pericolo.vita) + "□".repeat(5 - pericolo.vita);
+  }
+
+  // Il diario: una riga <p> per ogni evento
+  const diario = document.getElementById("colonia-diario");
+  diario.textContent = "";
+  colonia.diario.forEach(function (testo) {
+    const riga = document.createElement("p");
+    riga.textContent = testo;
+    diario.appendChild(riga);
+  });
+
+  // Fame: compare la zona per le briciole. Estinta: compare "Nuova colonia"
+  document.getElementById("zona-briciole").hidden = !fame;
+  document.getElementById("nuova-colonia").hidden = !estinta();
+
+  // Camere: si vedono solo i tunnel già scavati (data-camera in index.html)
+  document.querySelectorAll("#desktop [data-camera]").forEach(function (pezzo) {
+    pezzo.style.display = Number(pezzo.dataset.camera) <= colonia.camere ? "" : "none";
+  });
+
+  aggiornaFormiche();
+  salvaColonia();
+}
+
+// Le formiche che camminano: ne disegno 1 ogni 3 operaie (massimo 14) e 1 per ogni soldata (massimo 4)
+function aggiornaFormiche() {
+  sistemaFormiche("operaia", Math.min(14, Math.ceil(colonia.operaie / 3)));
+  sistemaFormiche("soldata", Math.min(4, colonia.soldate));
+}
+
+// Aggiunge o toglie formiche di un tipo finché sono il numero giusto
+function sistemaFormiche(tipo, quante) {
+  const mondo = document.querySelector(".mondo");
+  const presenti = mondo.querySelectorAll(".formica." + tipo);
+
+  for (let i = presenti.length; i > quante; i--) {
+    presenti[i - 1].remove();                       // troppe: tolgo le ultime
+  }
+  for (let i = presenti.length; i < quante; i++) {
+    mondo.appendChild(creaFormica(tipo));            // poche: ne aggiungo di nuove
+  }
+}
+
+// Crea una formica che cammina in un tunnel a caso, tra quelli già scavati
+function creaFormica(tipo) {
+  const formica = document.getElementById("modello-formica").cloneNode(true);
+  formica.removeAttribute("id");
+  formica.hidden = false;
+  formica.classList.add(tipo);
+
+  const scavati = PERCORSI.filter(function (percorso) {
+    return percorso.camera <= colonia.camere;
+  });
+  const percorso = scavati[Math.floor(Math.random() * scavati.length)];
+  formica.style.offsetPath = "path('" + percorso.d + "')";                  // il tunnel da seguire
+  formica.style.animationDuration = percorso.durata + "s";
+  formica.style.animationDelay = (-Math.random() * percorso.durata) + "s";   // negativo = è già in cammino
+
+  if (Math.random() < 0.5) formica.classList.add("indietro");               // metà vanno al contrario
+  if (tipo === "operaia") {
+    const caso = Math.random();
+    if (caso < 0.2) formica.classList.add("porta-briciola");
+    else if (caso < 0.35) formica.classList.add("porta-foglia");
+  }
+  return formica;
+}
+
+// La finestra colonia.exe: si apre, si chiude e si riapre dalla barra delle applicazioni
+function apriFinestraColonia() {
+  document.getElementById("finestra-colonia").hidden = false;
+  document.getElementById("tab-colonia").classList.add("attiva");
+}
+
+function chiudiFinestraColonia() {
+  document.getElementById("finestra-colonia").hidden = true;
+  document.getElementById("tab-colonia").classList.remove("attiva");
+}
+
+function cambiaFinestraColonia() {
+  if (document.getElementById("finestra-colonia").hidden) {
+    apriFinestraColonia();
+  } else {
+    chiudiFinestraColonia();
+  }
+}
+
+
+// 11. PARTENZA: preparo menu ed easter egg (ci sono in tutte le pagine),
 //     poi capisco in che pagina sono e avvio quella giusta
 preparaMenu();
 preparaEasterEgg();

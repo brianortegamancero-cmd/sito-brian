@@ -1199,12 +1199,13 @@ h2::before {
   offset-rotate: auto;
   filter: drop-shadow(0 0 3px rgba(0, 255, 65, 0.7));
   animation: cammina linear infinite;
+  pointer-events: none;          /* le formiche non bloccano i clic sui pericoli */
 }
 
 .formica svg {
   display: block;
-  width: 24px;
-  height: 14px;
+  width: 100%;
+  height: 100%;
 }
 
 .formica ellipse,
@@ -1255,12 +1256,29 @@ h2::before {
   animation-direction: reverse;
 }
 
-/* I 5 percorsi (gli stessi tunnel disegnati nell'SVG) e quanto ci mettono */
-.r1 { offset-path: path("M1400 84 H560 Q522 52 480 58 C470 130 530 170 510 230 S430 310 400 350 S330 410 300 456"); animation-duration: 18s; }
-.r2 { offset-path: path("M510 230 C590 250 650 290 700 320 S780 370 800 392"); animation-duration: 7s; }
-.r3 { offset-path: path("M400 350 C360 335 300 325 270 304"); animation-duration: 5s; }
-.r4 { offset-path: path("M492 150 C540 160 590 170 630 178"); animation-duration: 4s; }
-.r5 { offset-path: path("M-440 84 H400 Q438 52 480 58"); animation-duration: 14s; }
+/* Il percorso (offset-path) e la durata di ogni formica li sceglie script.js */
+
+/* Le soldate sono più grandi */
+.soldata {
+  width: 34px;
+  height: 20px;
+}
+
+/* Le nemiche sono bianche e camminano in superficie verso il buco */
+.nemica {
+  offset-path: path("M1100 84 H560 Q530 62 506 58");
+  animation-duration: 5s;
+  filter: none;
+}
+
+.nemica ellipse,
+.nemica circle {
+  fill: var(--testo);
+}
+
+.nemica path {
+  stroke: var(--testo);
+}
 
 /* La formica compare all'inizio del percorso e sparisce alla fine */
 @keyframes cammina {
@@ -1350,11 +1368,22 @@ h2::before {
   stroke-width: 2;
 }
 
-/* LA FINESTRA DEI MESSAGGI (Accesso negato, Phonix), in alto a destra */
+/* LE FINESTRE DEL DESKTOP (colonia.exe e i messaggi): stessa grafica, posti diversi */
+.finestra-colonia {
+  top: 16px;
+  right: 16px;
+}
+
+/* i messaggi (Accesso negato, Phonix) al centro, sopra la colonia */
+.finestra-messaggio {
+  top: 140px;
+  left: 50%;
+  z-index: 3;
+  margin-left: -150px;           /* metà della larghezza: così è centrata */
+}
+
 .finestra-desktop {
   position: absolute;
-  top: 112px;
-  right: 16px;
   z-index: 2;
   width: 300px;
   background: var(--sfondo);
@@ -1604,6 +1633,281 @@ h2::before {
 #data {
   color: var(--grigio);
   font-size: 11px;
+}
+
+/* il programma colonia.exe nella barra: sottolineato di verde quando la finestra è aperta */
+.tab-colonia {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--bordo);
+  color: var(--testo);
+  font: 12px var(--mono);
+  cursor: pointer;
+}
+
+.tab-colonia.attiva {
+  border-bottom-color: var(--verde);
+  background: var(--verde-tenue);
+}
+
+/* 18e. LA COLONIA DI FORMICHE */
+
+/* Lo stato con la lucina: lampeggia quando c'è un problema */
+.finestra-corpo .colonia-stato {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--grigio);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.colonia-stato::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--verde);
+}
+
+.finestra-corpo .colonia-stato.allarme {
+  color: var(--verde);
+}
+
+.colonia-stato.allarme::before {
+  box-shadow: var(--bagliore);
+  animation: lampeggia 1s steps(1) infinite;
+}
+
+/* I numeri in due colonne: nome a sinistra, valore a destra */
+.colonia-numeri {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 6px 12px;
+  align-items: center;
+  margin: 0;
+  font-size: 13px;
+}
+
+.colonia-numeri dt {
+  color: var(--grigio);
+}
+
+.colonia-numeri dd {
+  margin: 0;
+  color: var(--bianco);
+  font-weight: 700;
+}
+
+#colonia-camere {
+  color: var(--verde);
+  letter-spacing: 1px;
+}
+
+/* La barra del cibo, come le batterie delle competenze */
+.riga-cibo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.barra-cibo {
+  flex: 1;
+  height: 12px;
+  padding: 2px;
+  border: 1px solid var(--testo);
+}
+
+#colonia-cibo-barra {
+  display: block;
+  height: 100%;
+  background: var(--verde);
+  transition: width 0.4s;
+}
+
+/* Il diario: l'ultima riga (la più nuova) è verde */
+.finestra-corpo .colonia-titolo-diario {
+  padding-top: 10px;
+  border-top: 1px solid var(--bordo);
+  color: var(--grigio);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.finestra-corpo .colonia-diario p {
+  color: var(--grigio);
+  font-size: 12px;
+}
+
+.finestra-corpo .colonia-diario p:last-child {
+  color: var(--verde);
+  font-weight: 700;
+}
+
+/* I PERICOLI: uno strato grande come il formicaio; si possono cliccare solo i pulsanti */
+.pericolo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pericolo[hidden] {
+  display: none;
+}
+
+.colpisci {
+  position: absolute;
+  padding: 0;
+  background: transparent;
+  border: none;
+  pointer-events: auto;
+  cursor: crosshair;             /* il mirino */
+}
+
+/* piccolo lampo verde quando colpisci */
+.colpisci.colpito {
+  background: rgba(0, 255, 65, 0.35);
+}
+
+/* Il ragno: bianco con gli occhi verdi, si muove su e giù */
+.ragno {
+  left: 470px;
+  top: 128px;
+  width: 60px;
+  height: 64px;
+  border-radius: 50%;
+}
+
+.ragno svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: ragno 0.9s ease-in-out infinite alternate;
+}
+
+.ragno path {
+  fill: none;
+  stroke: var(--testo);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.ragno ellipse,
+.ragno circle {
+  fill: var(--testo);
+}
+
+.ragno .occhi {
+  fill: var(--verde);
+}
+
+/* La pioggia: gocce che cadono e acqua nel tunnel principale */
+.pioggia-disegno {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.goccia {
+  stroke: var(--testo);
+  stroke-width: 1.5;
+  animation: cade 0.9s linear infinite;
+}
+
+.acqua {
+  fill: none;
+  stroke: rgba(230, 230, 230, 0.3);
+  stroke-width: 14;
+  stroke-linecap: round;
+}
+
+.rivolo {
+  fill: none;
+  stroke: var(--testo);
+  stroke-width: 3;
+  stroke-dasharray: 3 9;
+  stroke-linecap: round;
+  animation: scorre 0.8s linear infinite;
+}
+
+.acqua-bottone {
+  left: 462px;
+  top: 56px;
+  width: 72px;
+  height: 180px;
+  border: 1px dashed var(--verde);
+  border-radius: 30px;
+}
+
+/* Le nemiche: la zona da cliccare è la superficie vicino al buco */
+.nemiche-bottone {
+  left: 496px;
+  top: 30px;
+  width: 300px;
+  height: 66px;
+  border: 1px dashed var(--verde);
+}
+
+/* La scritta che dice cosa cliccare, con la vita che resta al pericolo */
+.aiuto {
+  position: absolute;
+  padding: 4px 10px;
+  background: var(--sfondo);
+  border: 1px dashed var(--verde);
+  color: var(--verde);
+  font: 700 11px var(--mono);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.vita {
+  margin-left: 6px;
+  letter-spacing: 2px;
+}
+
+#pericolo-ragno .aiuto   { left: 540px; top: 146px; }
+#pericolo-pioggia .aiuto { left: 546px; top: 110px; }
+#pericolo-nemiche .aiuto { left: 560px; top: 102px; }
+
+/* FAME: la zona in superficie dove si lasciano le briciole */
+.zona-briciole {
+  position: absolute;
+  left: 40px;
+  top: 16px;
+  width: 380px;
+  height: 64px;
+  background: var(--verde-tenue);
+  border: 1px dashed var(--verde);
+  color: var(--verde);
+  font: 700 12px var(--mono);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  animation: respiro 1.5s ease-in-out infinite;
+}
+
+.zona-briciole[hidden] {
+  display: none;
+}
+
+@keyframes ragno {
+  to { transform: translateY(5px); }
+}
+
+@keyframes cade {
+  from { transform: translateY(0); opacity: 0; }
+  20%  { opacity: 1; }
+  to   { transform: translateY(40px); opacity: 0; }
+}
+
+@keyframes scorre {
+  to { stroke-dashoffset: -24; }
 }
 
 /* Per chi ha chiesto al computer di ridurre le animazioni: niente formiche in movimento */
