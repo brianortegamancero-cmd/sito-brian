@@ -211,6 +211,7 @@ const DISCO = {
         { nome: "passione1.webp", immagine: "passione1.webp" },
         { nome: "passione2.webp", immagine: "passione2.webp" },
         { nome: "justfix.jpg", immagine: "justfix.jpg" },
+        { nome: "riparazioni.webp", immagine: "riparazioni.webp" },
         { nome: "logo-scuola.webp", immagine: "logo-scuola.webp" }
       ]
     },
