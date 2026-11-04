@@ -1,0 +1,549 @@
+/* app.css – contenuto delle app (profilo, CV, stage, extra) */
+/* 5. PRESENTAZIONE */
+.presentazione {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 32px;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+}
+
+#foto {
+  flex-shrink: 0;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;     /* la foto riempie il cerchio senza deformarsi */
+  border: 3px solid var(--verde);
+  box-shadow: var(--bagliore);
+  background: var(--bordo);
+}
+
+/* Finché la foto non arriva dal foglio (l'immagine non ha ancora un src):
+   niente scritta, solo il cerchio che "respira" piano */
+#foto:not([src]) {
+  color: transparent;            /* nasconde la scritta "Foto di Brian Ortega" */
+  animation: respiro 1.5s ease-in-out infinite;
+}
+
+.presentazione p {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+/* 6. CARD DELLE PASSIONI */
+.griglia {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  overflow: hidden;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+/* Al passaggio del mouse la card sale e il bordo si accende di verde */
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--verde);
+}
+
+.card img {
+  display: block;
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background: var(--bordo);
+}
+
+.card h3 {
+  margin: 16px 20px 8px;
+}
+
+.card p {
+  margin: 0 20px 20px;
+  color: var(--grigio);
+}
+
+/* 7. COMPETENZE COME BATTERIE */
+.competenza {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  padding: 16px 20px;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+}
+
+.nome-competenza {
+  flex: 1;
+  font-weight: 600;
+}
+
+.batteria {
+  position: relative;
+  width: 180px;
+  height: 26px;
+  padding: 3px;
+  border: 2px solid var(--testo);
+  border-radius: 6px;
+}
+
+/* Il "polo" della batteria a destra */
+.batteria::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: -7px;
+  width: 4px;
+  height: 10px;
+  background: var(--testo);
+  border-radius: 0 2px 2px 0;
+}
+
+.carica {
+  height: 100%;
+  background: var(--verde);
+  border-radius: 3px;
+  box-shadow: var(--bagliore);
+  /* parte dopo 0,9 secondi (il tempo che compaia la sezione) e fino ad allora resta vuota */
+  animation: ricarica 1.5s ease-out 0.9s backwards;
+}
+
+.percentuale {
+  width: 48px;
+  text-align: right;
+  font-family: var(--mono);
+  color: var(--grigio);
+}
+
+/* 8. MESSAGGIO D'ERRORE (rosso, come un errore nel terminale) */
+.errore {
+  margin-top: 32px;
+  padding: 16px 20px;
+  background: #1a0606;
+  color: #ff5f56;
+  border-left: 4px solid #ff5f56;
+  font-family: var(--mono);
+}
+/* 10. TITOLO DELLE PAGINE INTERNE (CV, Stage, Lavori, Extra) */
+.titolo-pagina {
+  margin: 48px 0 0;
+  font-family: var(--mono);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1.2;
+}
+
+.titolo-pagina::before {
+  content: "> ";
+  color: var(--verde);
+  text-shadow: var(--bagliore);
+}
+
+/* Cursore lampeggiante, come nella Home */
+.titolo-pagina::after {
+  content: "_";
+  color: var(--verde);
+  animation: lampeggia 1s steps(1) infinite;
+}
+
+/* 11. LINEA DEL TEMPO (CV: lavoro e istruzione) */
+.timeline {
+  margin-left: 8px;              /* spazio per i pallini che escono a sinistra */
+  padding-left: 28px;
+  border-left: 2px solid var(--bordo);   /* la linea verticale */
+}
+
+.tappa {
+  position: relative;
+  margin-bottom: 16px;
+  padding: 20px 24px;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+  animation: appari 0.4s ease;
+}
+
+.tappa:last-child {
+  margin-bottom: 0;
+}
+
+/* Il pallino sulla linea, all'altezza del periodo */
+.tappa::before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  left: -37px;                   /* lo porta sopra la linea verticale */
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--sfondo);
+  border: 3px solid var(--verde);
+}
+
+/* Quello che sto facendo adesso: pallino pieno che pulsa, come un LED acceso */
+.tappa.in-corso::before {
+  background: var(--verde);
+  animation: impulso 2s infinite;
+}
+
+.periodo {
+  margin: 0 0 4px;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: var(--verde);
+}
+
+.tappa h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.luogo {
+  margin: 2px 0 0;
+  color: var(--grigio);
+}
+
+.descrizione {
+  margin: 12px 0 0;
+}
+
+/* 12. ETICHETTE (competenze trasversali) */
+.etichette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.etichetta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 999px;          /* bordi tutti tondi */
+  font-weight: 600;
+}
+
+/* La lucina verde davanti a ogni etichetta */
+.etichetta::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--verde);
+  box-shadow: var(--bagliore);
+}
+
+/* 13. LINGUE */
+.lingue {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.lingua {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+}
+
+.nome-lingua {
+  font-weight: 600;
+}
+
+.livello {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--verde);
+}
+
+/* MESSAGGIO DI CARICAMENTO: si vede solo mentre i dati arrivano dal foglio */
+.caricamento {
+  margin: 8px 0 0;
+  font-family: var(--mono);
+  color: var(--verde);
+  text-shadow: var(--bagliore);
+}
+
+.caricamento::before {
+  content: "> ";
+}
+
+/* Cursore che lampeggia: fa capire che sta lavorando */
+.caricamento::after {
+  content: "_";
+  animation: lampeggia 1s steps(1) infinite;
+}
+
+.caricamento[hidden] {
+  display: none;
+}
+
+/* 14. RIEPILOGO SOTTO IL TITOLO (es. "Ticket trovati: 2") */
+.riepilogo {
+  min-height: 1.6em;             /* lo spazio c'è già prima che arrivino i dati */
+  margin: 8px 0 0;
+  font-family: var(--mono);
+  color: var(--grigio);
+}
+
+/* 15. TICKET DI ASSISTENZA (pagina Stage) */
+.griglia-ticket {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.ticket {
+  overflow: hidden;              /* la parte alta segue gli angoli tondi */
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+  transition: transform 0.2s, border-color 0.2s;
+  animation: appari 0.4s ease;
+}
+
+.ticket:hover {
+  transform: translateY(-4px);
+  border-color: var(--verde);
+}
+
+/* Parte alta del ticket: numero e stato */
+.ticket-testa {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  background: var(--fascia);
+  border-bottom: 1px solid var(--bordo);
+  font-family: var(--mono);
+}
+
+.numero-ticket {
+  color: var(--bianco);
+  font-weight: 700;
+}
+
+/* Lo stato: pastiglia verde con la lucina, come un LED acceso */
+.stato {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--verde-tenue);
+  color: var(--verde);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.stato::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--verde);
+  box-shadow: var(--bagliore);
+}
+
+.ticket-corpo {
+  padding: 24px;
+}
+
+.ticket-corpo h3 {
+  margin: 0 0 16px;
+  font-size: 1.2rem;
+}
+
+/* Dettagli in due colonne: etichetta a sinistra, valore a destra */
+.ticket-corpo dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 10px 20px;
+  margin: 0;
+}
+
+.ticket-corpo dt {
+  padding-top: 2px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--grigio);
+}
+
+.ticket-corpo dd {
+  margin: 0;
+}
+
+/* 15b. PAGINA EXTRA (i miei lavori): card come quelle delle passioni nella Home */
+
+/* finché il titolo non arriva dal foglio, lo spazio c'è già */
+#titolo-extra {
+  min-height: 1.2em;
+}
+
+.intro-extra {
+  max-width: 640px;
+  min-height: 1.6em;
+  margin: 8px 0 32px;
+  color: var(--grigio);
+}
+
+/* la card è una colonna: immagine sopra, testi sotto, pulsante sempre in fondo */
+.card-extra {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-corpo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px 20px;
+}
+
+.card-extra h3,
+.card-extra p {
+  margin: 0;
+}
+
+/* la categoria: piccola etichetta verde */
+.categoria {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--verde-tenue);
+  color: var(--verde);
+  font: 700 0.75rem var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* il pulsante "Apri": bordo verde, si riempie passandoci sopra */
+.pulsante-apri {
+  align-self: flex-start;
+  margin-top: auto;              /* lo spinge in fondo alla card */
+  padding: 8px 18px;
+  border: 1px solid var(--verde);
+  border-radius: 8px;
+  color: var(--verde);
+  font: 700 0.85rem var(--mono);
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.pulsante-apri::after {
+  content: " ↗";
+}
+
+.pulsante-apri:hover {
+  background: var(--verde);
+  color: var(--sfondo);
+}
+
+/* 16. ANIMAZIONI */
+@keyframes appari {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+@keyframes lampeggia {
+  50% { opacity: 0; }
+}
+
+@keyframes ricarica {
+  from { width: 0; }    /* la batteria parte vuota e si carica */
+}
+
+@keyframes respiro {
+  50% { opacity: 0.4; }
+}
+
+@keyframes impulso {
+  from { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.6); }
+  to   { box-shadow: 0 0 0 10px rgba(0, 255, 65, 0); }
+}
+
+
+/* PROFILO (la vecchia Home): il terminale con il nome che si scrive */
+.profilo-terminale {
+  margin: 24px 0;
+  padding: 24px 28px;
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 12px;
+  font-family: var(--mono);
+  color: var(--verde);
+  text-shadow: var(--bagliore);
+}
+
+.profilo-righe p {
+  margin: 4px 0;
+  opacity: 0.8;
+  animation: appari 0.3s ease;
+}
+
+.profilo-nome {
+  min-height: 1.2em;
+  margin: 20px 0 4px;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.2;
+  color: var(--bianco);
+  text-shadow: 0 0 14px rgba(0, 255, 65, 0.35);
+}
+
+.profilo-nome::after {
+  content: "_";
+  color: var(--verde);
+  animation: lampeggia 1s steps(1) infinite;
+}
+
+.profilo-ruolo {
+  min-height: 1.6em;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.profilo-resto {
+  animation: appari 0.6s ease;
+}
+
+.contenuto-app .titolo-pagina {
+  margin-top: 24px;
+}
+
+@media (max-width: 700px) {
+  .presentazione {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .competenza {
+    flex-wrap: wrap;
+  }
+
+  .nome-competenza {
+    flex-basis: 100%;
+  }
+
+  .batteria {
+    flex: 1;
+  }
+}

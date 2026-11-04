@@ -1,0 +1,558 @@
+/* colonia.css – il formicaio e la colonia (estratto dal vecchio style.css) */
+/* LA FINESTRA DELLA COLONIA: a sinistra la vista del formicaio, a destra i numeri */
+.colonia-app {
+  display: flex;
+  height: 100%;
+}
+
+.colonia-vista {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--sfondo);
+}
+
+.colonia-lato {
+  width: 250px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  border-left: 1px solid var(--bordo);
+  background: var(--sfondo);
+}
+
+/* IL FORMICAIO: un riquadro di 960 x 552 pixel.
+   Le formiche camminano su percorsi misurati in pixel dentro questo riquadro;
+   os.js lo ingrandisce o rimpicciolisce (scale) per farlo stare nella finestra */
+.mondo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 960px;
+  height: 552px;
+  transform-origin: 0 0;
+}
+
+.formicaio {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;             /* la linea del terreno continua fuori dal riquadro */
+}
+
+/* LE CREATURE (formiche e ragno): script.js le sposta a ogni fotogramma cambiando il transform */
+.creatura {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: center;
+  pointer-events: none;          /* non bloccano i clic */
+  transition: opacity 0.5s;      /* compaiono e spariscono piano */
+}
+
+/* quando nasce (all'inizio) e quando muore è trasparente */
+.creatura.muore {
+  opacity: 0;
+}
+
+/* lampo bianco quando viene colpita in un combattimento */
+.creatura.lampo,
+.ferita {
+  filter: drop-shadow(0 0 6px #ffffff) brightness(1.8);
+}
+
+/* Una formica: 24 x 14 pixel */
+.formica {
+  width: 24px;
+  height: 14px;
+  filter: drop-shadow(0 0 3px rgba(0, 255, 65, 0.7));
+}
+
+.formica svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.formica ellipse,
+.formica circle {
+  fill: var(--verde);
+}
+
+.formica path {
+  fill: none;
+  stroke: var(--verde);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+}
+
+/* le righe nere sull'addome */
+.formica .strisce {
+  stroke: var(--sfondo);
+  stroke-width: 0.8;
+}
+
+/* Le due posizioni delle zampe si accendono a turno: sembra che cammini */
+.zampe-a {
+  animation: passo 0.3s steps(1) infinite;
+}
+
+.zampe-b {
+  animation: passo 0.3s steps(1) infinite -0.15s;
+}
+
+/* Quello che trasporta: di solito niente, a volte una briciola o una foglia */
+.formica .carico {
+  display: none;
+}
+
+.porta-briciola .carico {
+  display: inline;
+  fill: var(--testo);
+}
+
+.porta-foglia .carico {
+  display: inline;
+  fill: #0f8a2c;
+}
+
+/* le nutrici portano le uova: bianche e arrotondate */
+.porta-uovo .carico {
+  display: inline;
+  fill: var(--bianco);
+  rx: 1.8px;
+}
+
+/* Le soldate sono più grandi */
+.soldata {
+  width: 34px;
+  height: 20px;
+}
+
+/* Le nemiche sono bianche */
+.nemica {
+  filter: none;
+}
+
+.nemica ellipse,
+.nemica circle {
+  fill: var(--testo);
+}
+
+.nemica path {
+  stroke: var(--testo);
+}
+
+@keyframes passo {
+  50% { opacity: 0; }
+}
+.finestra-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 18px 16px;
+}
+
+.finestra-corpo p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.finestra-corpo .finestra-intestazione {
+  color: var(--verde);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-shadow: var(--bagliore);
+}
+
+.finestra-ok {
+  align-self: flex-end;
+  padding: 6px 16px;
+  background: transparent;
+  border: 1px solid var(--verde);
+  color: var(--verde);
+  font: 700 13px var(--mono);
+  cursor: pointer;
+}
+
+.finestra-ok:hover {
+  background: var(--verde);
+  color: var(--sfondo);
+}
+/* 18e. LA COLONIA DI FORMICHE */
+
+/* Lo stato con la lucina: lampeggia quando c'è un problema */
+.finestra-corpo .colonia-stato {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--grigio);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.colonia-stato::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--verde);
+}
+
+.finestra-corpo .colonia-stato.allarme {
+  color: var(--verde);
+}
+
+.colonia-stato.allarme::before {
+  box-shadow: var(--bagliore);
+  animation: lampeggia 1s steps(1) infinite;
+}
+
+/* I numeri in due colonne: nome a sinistra, valore a destra */
+.colonia-numeri {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 4px 12px;
+  align-items: center;
+  margin: 0;
+  font-size: 13px;
+}
+
+.colonia-numeri dt {
+  color: var(--grigio);
+}
+
+.colonia-numeri dd {
+  margin: 0;
+  color: var(--bianco);
+  font-weight: 700;
+}
+
+#colonia-camere {
+  color: var(--verde);
+  letter-spacing: 1px;
+}
+
+/* La barra del cibo, come le batterie delle competenze */
+.riga-cibo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.barra-cibo {
+  flex: 1;
+  height: 12px;
+  padding: 2px;
+  border: 1px solid var(--testo);
+}
+
+#colonia-cibo-barra {
+  display: block;
+  height: 100%;
+  background: var(--verde);
+  transition: width 0.4s;
+}
+
+/* Il diario: l'ultima riga (la più nuova) è verde */
+.finestra-corpo .colonia-titolo-diario {
+  padding-top: 10px;
+  border-top: 1px solid var(--bordo);
+  color: var(--grigio);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.finestra-corpo .colonia-diario p {
+  overflow: hidden;              /* una riga sola: se è troppo lunga finisce con … */
+  color: var(--grigio);
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.finestra-corpo .colonia-diario p:last-child {
+  color: var(--verde);
+  font-weight: 700;
+}
+
+/* LA PIOGGIA: uno strato grande come il formicaio, con gocce e acqua (non blocca i clic) */
+.pericolo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pericolo[hidden] {
+  display: none;
+}
+
+/* gocce e rivolo si vedono solo mentre piove; l'acqua resta finché le operaie non la tolgono */
+.pericolo:not(.piove) .goccia,
+.pericolo:not(.piove) .rivolo {
+  display: none;
+}
+
+.pioggia-disegno {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.goccia {
+  stroke: var(--testo);
+  stroke-width: 1.5;
+  animation: cade 0.9s linear infinite;
+}
+
+/* l'acqua nel tunnel: script.js cambia l'opacità in base a quanta ce n'è */
+.acqua {
+  fill: none;
+  stroke: rgba(230, 230, 230, 0.35);
+  stroke-width: 14;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.rivolo {
+  fill: none;
+  stroke: var(--testo);
+  stroke-width: 3;
+  stroke-dasharray: 3 9;
+  stroke-linecap: round;
+  animation: scorre 0.8s linear infinite;
+}
+
+/* IL RAGNO: bianco con gli occhi verdi, si muove su e giù mentre cammina */
+.ragno {
+  width: 60px;
+  height: 64px;
+}
+
+.ragno svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: ragno 0.9s ease-in-out infinite alternate;
+}
+
+.ragno path {
+  fill: none;
+  stroke: var(--testo);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.ragno ellipse,
+.ragno circle {
+  fill: var(--testo);
+}
+
+.ragno .occhi {
+  fill: var(--verde);
+}
+
+/* 18f. COLONIA: CLIC, MORTE, ALATE, NOTTE, INVERNO E SCHEDA */
+
+/* formiche e ragno si possono cliccare; l'area del clic è un po' più grande del disegno */
+.formica,
+.ragno {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.formica::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+
+#regina,
+#regina-nuova {
+  cursor: pointer;
+}
+
+/* la creatura scelta col clic: alone bianco */
+.creatura.scelta {
+  z-index: 1;
+  filter: drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 6px #ffffff);
+}
+
+/* formica morta: grigia, con le zampe ferme */
+.morta {
+  filter: none;
+}
+
+.morta ellipse,
+.morta circle {
+  fill: var(--grigio);
+}
+
+.morta path {
+  stroke: var(--grigio);
+}
+
+.morta .zampe-a,
+.morta .zampe-b {
+  animation: none;
+}
+
+.morta .zampe-b {
+  opacity: 0;
+}
+
+/* le becchine portano le morte al cimitero */
+.porta-corpo .carico {
+  display: inline;
+  fill: var(--grigio);
+}
+
+/* le ali ci sono solo nelle alate, e sbattono veloci */
+.formica .ali {
+  display: none;
+}
+
+.alata .ali {
+  display: inline;
+  fill: rgba(255, 255, 255, 0.5);
+  stroke: none;
+  animation: sbatte 0.1s steps(2) infinite;
+}
+
+/* NOTTE: un velo scuro con luna e stelle, che arriva e se ne va piano (tramonto e alba) */
+.velo-notte {
+  position: absolute;
+  top: -300px;
+  bottom: -300px;
+  left: -2000px;
+  right: -2000px;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 3s;
+  pointer-events: none;
+}
+
+.mondo.notte .velo-notte {
+  opacity: 1;
+}
+
+/* il cielo con la luna, nella stessa posizione del formicaio */
+.cielo-notte {
+  position: absolute;
+  top: 300px;
+  left: 2000px;
+  width: 960px;
+  height: 90px;
+}
+
+/* INVERNO: neve che cade, terreno bianco, niente erba */
+.neve {
+  display: none;
+}
+
+.mondo.inverno .neve {
+  display: inline;
+}
+
+.mondo.inverno .erba {
+  display: none;
+}
+
+.mondo.inverno .terreno {
+  stroke: var(--testo);
+}
+
+.fiocco {
+  fill: var(--testo);
+  animation: nevica 4s linear infinite;
+}
+
+/* LA SCHEDA DI UNA FORMICA, in basso a sinistra */
+.scheda {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 3;
+  width: 260px;
+  background: var(--sfondo);
+  border: 1px solid var(--verde);
+  box-shadow: 0 0 24px rgba(0, 255, 65, 0.25);
+  animation: appari 0.2s ease;
+}
+
+.scheda[hidden] {
+  display: none;
+}
+
+.scheda-testo {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-line;          /* rispetta gli "a capo" */
+}
+
+@keyframes sbatte {
+  50% { opacity: 0.2; }
+}
+
+@keyframes nevica {
+  from { transform: translateY(-10px); opacity: 0; }
+  20%  { opacity: 1; }
+  to   { transform: translateY(80px); opacity: 0; }
+}
+
+@keyframes ragno {
+  to { transform: translateY(5px); }
+}
+
+@keyframes cade {
+  from { transform: translateY(0); opacity: 0; }
+  20%  { opacity: 1; }
+  to   { transform: translateY(40px); opacity: 0; }
+}
+
+@keyframes scorre {
+  to { stroke-dashoffset: -24; }
+}
+
+/* Per chi ha chiesto al computer di ridurre le animazioni: le zampe stanno ferme */
+@media (prefers-reduced-motion: reduce) {
+  .zampe-a,
+  .zampe-b {
+    animation: none;
+  }
+}
+
+/* barra della scheda e dei pannelli della colonia */
+.scheda-barra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 6px 6px 12px;
+  background: var(--fascia);
+  border-bottom: 1px solid var(--bordo);
+  font-size: 12px;
+}
+
+.scheda-barra button {
+  padding: 2px 8px;
+  background: none;
+  border: none;
+  color: var(--testo);
+  font: inherit;
+  cursor: pointer;
+}
+
+.scheda-barra button:hover {
+  background: #e81123;
+  color: var(--bianco);
+}
