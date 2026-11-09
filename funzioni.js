@@ -140,8 +140,7 @@ function notificaColonia(testo) {
 
 const CONTATTI = [
   { nome: "GitHub", dettaglio: "github.com/brianortegamancero-cmd", link: "https://github.com/brianortegamancero-cmd" },
-  { nome: "Bryant Developer", dettaglio: "Siti web per attività di Milano", link: "https://bryant-phonix.pages.dev/" },
-  { nome: "Phonix", dettaglio: "Riparazioni di telefoni, tablet e PC", link: "https://bryant-phonix.pages.dev/phonix/" }
+  { nome: "Bryant ⇄ Phonix", dettaglio: "Siti web e riparazioni a Milano", link: "https://bryant-phonix.pages.dev/" }
 ];
 
 function costruisciContatti(corpo) {

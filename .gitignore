@@ -1,0 +1,11 @@
+# File che NON vanno mai su GitHub (e quindi mai online)
+_documenti/
+_backup/
+CLAUDE.md
+.claude/
+.vscode/
+Thumbs.db
+desktop.ini
+
+# Versione vecchia a più pagine: resta sul PC, non online
+_vecchio/

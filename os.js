@@ -389,7 +389,7 @@ function cambiaSfondo(id) {
 }
 
 function caricaSfondo() {
-  let id = "formicaio";
+  let id = "griglia";    // sfondo di partenza: la griglia
   try {
     id = localStorage.getItem(CHIAVE_SFONDO) || id;
   } catch (errore) {}
@@ -926,6 +926,10 @@ function costruisciStage(corpo) {
 
   caricaNellApp(contenuto, "stage", function (righe) {
     const stage = prendiSezione(righe, "stage");
+    // In ordine di ticket (#001, #002, #003...), qualunque sia l'ordine delle righe nel foglio
+    stage.sort(function (a, b) {
+      return a.ticket.localeCompare(b.ticket, "it", { numeric: true });
+    });
     riepilogo.textContent = "Ticket trovati: " + stage.length;
     const griglia = crea("div", "griglia-ticket");
     creaTicket(griglia, stage);

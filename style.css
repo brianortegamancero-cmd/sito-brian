@@ -1478,8 +1478,7 @@ body.trascina * {
   height: 64px;
   width: auto;
   padding: 6px 10px;
-  background: var(--bianco);
-  border-radius: 8px;
+  background: transparent;    /* logo già in verde e bianco: niente riquadro */
 }
 
 .info-fondo {
