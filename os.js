@@ -9,7 +9,9 @@
 //   7. partenza
 // =====================================================
 
-const PASSWORD = "r6iB4Sn29aL8E";            // la password di Brian (maiuscole e minuscole contano). Attenzione: il codice del sito è pubblico, quindi è scenografia, non vera sicurezza
+// Impronta (hash SHA-256) della password di Brian: la password vera non è scritta da nessuna parte nel codice.
+// Dall'impronta non si può tornare alla password. Il sito è pubblico e senza server: è scenografia, non vera sicurezza.
+const IMPRONTA_PASSWORD = "0b69980d5db2cb9bd8f9f7ee2151eef97fe7a7dbd2748f5ce63d08c3856b4049";
 const CHIAVE_AVVIO = "brainos-avvio";        // dice al prossimo caricamento di rifare l'avvio completo (riavvio, arresto, crollo)
 const CHIAVE_SFONDO = "brainos-sfondo";
 
@@ -153,6 +155,15 @@ function mostraBlocco() {
 
 let tentativi = 0;
 
+// Calcola l'impronta SHA-256 di un testo (64 caratteri esadecimali) con la crittografia del browser
+async function impronta(testo) {
+  const byte = new TextEncoder().encode(testo);
+  const risultato = await crypto.subtle.digest("SHA-256", byte);
+  return Array.from(new Uint8Array(risultato))
+    .map(function (b) { return b.toString(16).padStart(2, "0"); })
+    .join("");
+}
+
 function mostraLogin() {
   const campo = document.getElementById("login-password");
   campo.value = "";
@@ -167,7 +178,8 @@ function preparaLogin() {
 
   modulo.addEventListener("submit", async function (evento) {
     evento.preventDefault();
-    if (campo.value.trim() === PASSWORD) {
+    // confronto le impronte, non le password
+    if (await impronta(campo.value.trim()) === IMPRONTA_PASSWORD) {
       errore.textContent = "";
       tentativi = 0;
       suono("accesso");
