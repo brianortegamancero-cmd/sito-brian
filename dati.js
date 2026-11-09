@@ -61,7 +61,8 @@ function leggiCSV(testo) {
 
 // Scarica un foglio da Google e lo trasforma in righe
 async function caricaFoglio(link) {
-  const risposta = await fetch(link);
+  // no-store: il browser non usa una copia vecchia, scarica sempre il foglio aggiornato
+  const risposta = await fetch(link, { cache: "no-store" });
   if (!risposta.ok) throw new Error("Foglio non trovato");
   const testo = await risposta.text();
   return leggiCSV(testo);
